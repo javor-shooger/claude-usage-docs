@@ -35,6 +35,7 @@ For reference, Claude's context window is **200,000 tokens**, so the tool defini
 - **To reduce context cost from MCP tools**, you would need to remove the MCP server configuration from your Claude Code settings for sessions where you don't need browser automation.
 - **Skills and plugins can add more tools** — custom skills (`.claude/skills/`) and installed plugins may provide additional capabilities beyond the built-in and MCP tools listed here. See [Extending Claude Code](extending-claude-code.md).
 - **The system prompt itself** (instructions, CLAUDE.md content, git status, etc.) also consumes significant context — often more than the tool definitions themselves.
+- **Output styles** (`/output-style`) change how Claude formats responses — Default, Explanatory, or Learning modes — but are not tools. They modify the system prompt, not the tool set.
 
 ---
 

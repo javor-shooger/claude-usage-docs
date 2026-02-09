@@ -75,10 +75,18 @@ The YAML frontmatter configures the subagent. The markdown body becomes its syst
 | `name` | Yes | Unique identifier (lowercase, hyphens) |
 | `description` | Yes | When Claude should delegate to this subagent — write this clearly |
 | `tools` | No | Which tools the subagent can use. Inherits all if omitted |
+| `disallowedTools` | No | Tools to explicitly deny (alternative to allowlisting with `tools`) |
 | `model` | No | `sonnet`, `opus`, `haiku`, or `inherit` (default: `inherit`) |
-| `permissionMode` | No | `default`, `acceptEdits`, `plan`, `dontAsk`, `bypassPermissions` |
+| `permissionMode` | No | `default`, `acceptEdits`, `plan`, `dontAsk`, `delegate`, `bypassPermissions` |
+| `maxTurns` | No | Maximum agentic turns before stopping |
+| `skills` | No | Skills to preload into agent context at startup |
+| `mcpServers` | No | MCP servers available to this agent |
+| `hooks` | No | Lifecycle hooks scoped to this agent |
+| `memory` | No | Persistent memory scope: `user`, `project`, or `local` |
 
-For advanced fields (hooks, persistent memory, skills injection, MCP servers), see the [official subagents documentation](https://code.claude.com/docs/en/sub-agents).
+The `delegate` permission mode is for agent team leads — it restricts the agent to coordination-only, using team management tools rather than direct code tools.
+
+For detailed examples of advanced fields, see the [official subagents documentation](https://code.claude.com/docs/en/sub-agents).
 
 ---
 
@@ -190,6 +198,8 @@ They complement each other: CLAUDE.md provides the project baseline. Custom suba
 | **Can be spawned by Claude** | Yes | Yes |
 
 Custom subagents work exactly like built-in ones — they're spawned via the Task tool, get isolated context, and return a summary.
+
+**Resuming subagents:** Claude can resume a previous subagent's work by passing its agent ID. The resumed agent retains its full conversation history (tool calls, results, reasoning), so it can continue where it left off without re-doing initial exploration.
 
 ---
 

@@ -20,15 +20,21 @@ Out of the box, Claude Code has powerful built-in tools (Read, Edit, Bash, etc.)
 
 Skills are markdown files that give Claude **domain knowledge** or **reusable workflows**. Unlike CLAUDE.md (which loads every session), skills load **on demand** — only when Claude determines they're relevant or when you invoke them directly with a slash command.
 
+Skills follow the [Agent Skills open standard](https://agentskills.io), extended with Claude Code-specific features.
+
 ### Where They Live
 
 ```
-.claude/skills/
+.claude/skills/          ← project-level (commit to git for team use)
 ├── api-conventions/
 │   └── SKILL.md
 ├── fix-issue/
 │   └── SKILL.md
 └── deploy-checklist/
+    └── SKILL.md
+
+~/.claude/skills/        ← personal-level (available across all your projects)
+└── my-workflow/
     └── SKILL.md
 ```
 
@@ -71,6 +77,21 @@ Usage: `/fix-issue 1234` — the `1234` becomes `$ARGUMENTS` in the skill templa
 
 The `disable-model-invocation: true` flag means Claude won't auto-invoke this skill — you have to trigger it manually. This is good for workflows that make changes.
 
+### Skill Frontmatter Fields
+
+| Field | Description |
+|---|---|
+| `name` | Display name (lowercase, hyphens, max 64 chars) |
+| `description` | What the skill does and when to use it |
+| `argument-hint` | Hint for expected arguments (e.g., "issue number") |
+| `disable-model-invocation` | Prevent Claude from auto-loading (default: `false`) |
+| `user-invocable` | Show in `/` slash command menu (default: `true`) |
+| `allowed-tools` | Tools Claude can use without permission when skill is active |
+| `model` | Model to use when skill is active |
+| `context` | Set to `fork` to run the skill in a subagent (isolated context) |
+| `agent` | Which subagent type when `context: fork` is set |
+| `hooks` | Hooks scoped to the skill's lifecycle (cleaned up when done) |
+
 ### Key Points
 
 - Skills load on demand, not at session start — they **don't bloat your base context**
@@ -86,24 +107,37 @@ For the full skill configuration options, see the [official skills documentation
 
 Hooks are **shell scripts that run automatically** at specific points in Claude's workflow. Unlike CLAUDE.md instructions (which are advisory — Claude can choose to ignore them), hooks are **deterministic and guaranteed**.
 
+### Hook Types
+
+| Type | Description |
+|---|---|
+| **`command`** | Run a shell command (most common) |
+| **`prompt`** | Send a prompt to an LLM for evaluation |
+| **`agent`** | Spawn a subagent with tool access |
+
 ### When Hooks Fire
+
+The most commonly used events:
 
 | Hook Event | When It Runs | Example Use |
 |---|---|---|
 | **PreToolUse** | Before Claude uses a tool | Validate a Bash command, block writes to certain files |
-| **PostToolUse** | After Claude uses a tool | Run linter after every file edit |
+| **PostToolUse** | After a tool succeeds | Run linter after every file edit |
+| **PostToolUseFailure** | After a tool fails | Log failures, retry logic |
 | **Stop** | When Claude finishes a response | Run tests after implementation |
-| **SessionStart** | Session begins | Load env vars or project context |
+| **SessionStart** | Session begins or resumes | Load env vars or project context |
+| **SessionEnd** | Session terminates | Cleanup actions |
 | **UserPromptSubmit** | You submit a prompt | Add context to every prompt |
 
-For the full list of hook events, see the [official hooks reference](https://code.claude.com/docs/en/hooks).
+Additional events: **PermissionRequest**, **Notification**, **SubagentStart**, **SubagentStop**, **TeammateIdle**, **TaskCompleted**, **PreCompact** (14 events total).
+
+For the full list, see the [official hooks reference](https://code.claude.com/docs/en/hooks).
 
 ### Simple Example
 
-Run ESLint automatically after every file edit:
+Run ESLint automatically after every file edit. Hooks receive context via **JSON on stdin** — use `jq` to extract fields:
 
 ```json
-// .claude/settings.json
 {
   "hooks": {
     "PostToolUse": [
@@ -112,7 +146,7 @@ Run ESLint automatically after every file edit:
         "hooks": [
           {
             "type": "command",
-            "command": "npx eslint --fix $TOOL_INPUT_FILE_PATH"
+            "command": "jq -r '.tool_input.file_path' | xargs npx eslint --fix"
           }
         ]
       }
@@ -135,6 +169,8 @@ Run ESLint automatically after every file edit:
 - You can ask Claude to write hooks for you: "Write a hook that runs eslint after every file edit"
 - Use `/hooks` for interactive configuration
 - The `matcher` field filters which tools trigger the hook (e.g., only `Bash`, only `Edit|Write`)
+- **Async hooks** (`"async": true`) run in the background without blocking — only available for `command` type hooks
+- **Exit codes matter:** `0` = success, `2` = blocking error (shown to Claude/user), other = non-blocking error
 
 For the full hook event reference and configuration options, see the [official hooks documentation](https://code.claude.com/docs/en/hooks).
 
@@ -193,7 +229,7 @@ For details on creating your own plugins, see the [official plugins documentatio
 
 | Extension | Where defined | Loads when | Created by |
 |---|---|---|---|
-| **Skills** | `.claude/skills/*/SKILL.md` | On demand (when relevant or invoked) | You |
-| **Hooks** | `.claude/settings.json` or managed settings | Automatically at configured trigger points | You |
+| **Skills** | `.claude/skills/*/SKILL.md` or `~/.claude/skills/*/SKILL.md` | On demand (when relevant or invoked) | You |
+| **Hooks** | Settings JSON or managed settings | Automatically at configured trigger points (14 events) | You |
 | **Plugins** | Installed via `/plugin` | At session start | Community / you |
-| **MCP servers** | Settings JSON (`mcpServers` key) | At session start | External packages |
+| **MCP servers** | `~/.claude.json` or `.mcp.json` (`mcpServers` key) | At session start | External packages |

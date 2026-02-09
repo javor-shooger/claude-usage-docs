@@ -39,7 +39,9 @@ Phase 4: Verify
 
 **Why it works:** Mistakes in the planning phase are free — mistakes in the implementation phase cost context and may need reverting.
 
-**Tip:** After planning, consider `/compact focus on the implementation plan` before starting Phase 3. This drops the exploration context from planning and keeps the session lean for implementation.
+**Tips:**
+- After planning, consider `/compact focus on the implementation plan` before starting Phase 3. This drops the exploration context from planning and keeps the session lean for implementation.
+- If the plan was long and exploratory, `/clear` + re-stating the plan is even cleaner than compacting.
 
 ---
 
@@ -363,7 +365,7 @@ Create `.claude/agents/code-reviewer.md`:
 ---
 name: code-reviewer
 description: Senior code reviewer — checks correctness, security, and maintainability
-tools: [Read, Glob, Grep, Bash, Task]
+tools: Read, Glob, Grep, Bash
 ---
 When reviewing code:
 - Check for correctness, security, and maintainability
@@ -451,7 +453,7 @@ Step 3: Retry with better guidance
 > Session running for hours, multiple compactions, losing thread
 
 **Why it's bad:** After heavy compaction, Claude loses nuanced details. You spend tokens re-explaining things.
-**Instead:** Start a fresh session when shifting to a new task. Session memory carries the essentials forward.
+**Instead:** Run `/clear` between unrelated tasks, or start a fresh session. Session memory carries the essentials forward.
 
 ---
 

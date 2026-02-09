@@ -15,7 +15,7 @@ Project-specific instructions that persist across sessions, loaded from a hierar
 - `~/.claude/CLAUDE.md` — global, user-level
 - `CLAUDE.md` in project root — project-level, shared with team
 - `CLAUDE.local.md` — project-level, personal (auto-gitignored)
-- `.claude/CLAUDE.md` — project-level, personal
+- `.claude/CLAUDE.md` — project-level (can be committed or kept personal)
 - `.claude/rules/` — additional rule files (can have path-specific scoping)
 - `~/.claude/rules/` — user-level rule files
 
@@ -50,7 +50,7 @@ Space reserved for Claude's next response, including extended thinking.
 
 - **Compaction** kicks in automatically when context gets high. It summarizes the conversation, compressing older turns while preserving key decisions and code. Can be triggered manually with `/compact` — optionally with a focus: `/compact focus on the API changes`. Use `/context` to see what's consuming space.
 
-- **Checkpointing** — before every file edit, Claude snapshots the current state. Press `Esc+Esc` or run `/rewind` to open the rewind menu and restore conversation, code, or both to any previous checkpoint. This is local to your session, separate from git. See [official checkpointing docs](https://code.claude.com/docs/en/checkpointing) for details.
+- **Checkpointing** — every user prompt creates a new checkpoint (a snapshot of both conversation and file state). Press `Esc+Esc` or run `/rewind` to open the rewind menu with five options: restore code and conversation, restore conversation only, restore code only, **summarize from here** (compacts messages from that point forward), or cancel. Checkpoints persist across sessions and are auto-cleaned after 30 days. See [official checkpointing docs](https://code.claude.com/docs/en/checkpointing) for details.
 
 - **Subagents (Task tool)** get their own isolated context window. Only a summary result returns to the main agent, keeping the parent context clean.
 
@@ -94,8 +94,8 @@ Space reserved for Claude's next response, including extended thinking.
 
 - **Sessions are per-directory.** Each new session is tied to where you launched Claude. When you resume, you only see sessions from that directory.
 - **Name your sessions** with `/rename auth-refactor` so you can find them later with `claude --resume auth-refactor`.
-- **Resume** with `claude --continue` (most recent) or `claude --resume` (session picker).
-- **Fork** with `claude --continue --fork-session` to branch off and try a different approach without affecting the original session.
+- **Resume** with `claude --continue` (most recent) or `claude --resume` (session picker). Note: session-scoped permissions are NOT restored on resume — you'll need to re-approve them.
+- **Fork** with `claude --continue --fork-session` to branch off and try a different approach without affecting the original session. If you resume the same session in multiple terminals without forking, messages from both get interleaved — use `--fork-session` for parallel work.
 - **Parallel sessions** — use [git worktrees](https://git-scm.com/docs/git-worktree) to create separate directories for different branches, then run Claude in each one independently.
 
 ---

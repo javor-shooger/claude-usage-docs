@@ -48,7 +48,7 @@ Main session (200K context)
 |---|---|
 | **Tools available** | Read, Glob, Grep, Bash (read-only), WebFetch, WebSearch — all tools except Task, Edit, Write, NotebookEdit |
 | **Cannot** | Edit files, write files, spawn sub-subagents |
-| **Default model** | **Haiku** (not inherited from parent) — this is why Explore agents are fast and cheap |
+| **Default model** | **Haiku** — this is why Explore agents are fast and cheap |
 | **Best for** | "How does X work?", "Find where Y is defined", "What files handle Z?" |
 | **Thoroughness** | Specify in your prompt: "quick", "medium", or "very thorough" |
 
@@ -72,6 +72,7 @@ Main session (200K context)
 |---|---|
 | **Tools available** | Read, Glob, Grep, Bash (read-only), WebFetch, WebSearch — same as Explore (no edit/write) |
 | **Cannot** | Edit files, write files, spawn sub-subagents |
+| **Default model** | **Inherits from parent session** |
 | **Best for** | Designing approaches, identifying critical files, considering alternatives |
 
 **When to use:**
@@ -123,6 +124,7 @@ Main session (200K context)
 | Property | Detail |
 |---|---|
 | **Tools available** | Glob, Grep, Read, WebFetch, WebSearch |
+| **Default model** | **Haiku** |
 | **Best for** | "How do I configure X in Claude Code?", "What does this Claude API parameter do?" |
 
 **When to use:**
@@ -139,9 +141,12 @@ Main session (200K context)
 | Property | Detail |
 |---|---|
 | **Tools available** | Read, Edit |
+| **Default model** | **Sonnet** |
 | **Best for** | Status line configuration only |
 
 ---
+
+> **Note:** Tool lists and default models above are based on the observed system prompt. Official docs describe agent capabilities more generically (e.g., "read-only tools"). The details here are accurate as of the time of writing but may change.
 
 ## Key Parameters
 
@@ -204,6 +209,10 @@ With `run_in_background: true`:
 4. Check on the agent later by reading the output file
 5. Use TaskOutput to get the final result (with `block: true` to wait, or `block: false` to check status)
 6. Use TaskStop to kill a runaway background agent
+
+**Backgrounding a running agent:** Press **`Ctrl+B`** to send a currently-running foreground subagent to the background, so you can continue working while it finishes.
+
+**Permission pre-prompting:** Background subagents prompt for any needed tool permissions **before** they start running. Once in the background, they inherit the pre-approved permissions and auto-deny anything not pre-approved. If a background subagent fails because it needed an unapproved permission, you can resume it in the foreground for interactive prompting.
 
 **Good for:**
 - Long-running investigations while you work on something else

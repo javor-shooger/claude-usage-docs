@@ -35,18 +35,19 @@ MCP (Model Context Protocol) is an open protocol that lets Claude Code connect t
 
 ## Configuration
 
-MCP servers are configured in Claude Code's settings files.
+MCP servers are configured via CLI commands or JSON files.
 
-### Settings File Locations
+### Configuration Scopes
 
-| File | Scope |
-|---|---|
-| `~/.claude/settings.json` | Global — applies to all projects |
-| `.claude/settings.json` | Project-level — applies to this project only |
+| Scope | File | Shared? | Use when |
+|---|---|---|---|
+| **Local** (default) | `~/.claude.json` (keyed by project path) | No — personal | Default. Per-project, private to you |
+| **Project** | `.mcp.json` in project root | Yes — commit to git | Team-shared servers everyone needs |
+| **User** | `~/.claude.json` (cross-project section) | No — personal | General-purpose tools (like Playwright) you want everywhere |
 
-### Configuration Format
+### Configuration Format (stdio transport)
 
-MCP servers are defined under the `mcpServers` key in settings:
+MCP servers are defined under the `mcpServers` key:
 
 ```json
 {
@@ -62,13 +63,54 @@ MCP servers are defined under the `mcpServers` key in settings:
 }
 ```
 
+### Configuration Format (HTTP transport)
+
+For remote/cloud MCP servers, use the HTTP transport (recommended over the deprecated SSE transport):
+
+```json
+{
+  "mcpServers": {
+    "remote-server": {
+      "type": "http",
+      "url": "https://api.example.com/mcp",
+      "headers": {
+        "Authorization": "Bearer ${API_KEY}"
+      }
+    }
+  }
+}
+```
+
+### .mcp.json (Project-Level, Team-Shared)
+
+Create a `.mcp.json` file in your project root and commit it to git. This gives every team member the same MCP servers:
+
+```json
+{
+  "mcpServers": {
+    "project-tools": {
+      "command": "npx",
+      "args": ["@my-org/project-mcp-server"],
+      "env": {
+        "DATABASE_URL": "${DATABASE_URL:-postgresql://localhost:5432/mydb}"
+      }
+    }
+  }
+}
+```
+
+**Environment variable expansion:** `.mcp.json` supports `${VAR}` and `${VAR:-default}` syntax in `command`, `args`, `env`, `url`, and `headers` fields. This lets you commit the config with placeholders while each developer provides their own secrets via environment variables.
+
 ### Configuration Fields
 
 | Field | Required | Description |
 |---|---|---|
-| `command` | Yes | The command to launch the MCP server (e.g., `npx`, `node`, `python`) |
+| `command` | Yes (stdio) | The command to launch the MCP server (e.g., `npx`, `node`, `python`) |
 | `args` | No | Array of command-line arguments |
 | `env` | No | Environment variables to set for the server process |
+| `type` | No | Transport type: `"http"` for remote servers. Defaults to stdio |
+| `url` | Yes (http) | URL for HTTP transport |
+| `headers` | No | HTTP headers (for authentication, etc.) |
 
 ---
 
@@ -82,7 +124,7 @@ The Playwright MCP server is one of the most common MCP integrations. It provide
 # Quickest way (global)
 claude mcp add --scope user playwright -- npx @playwright/mcp@latest
 
-# Or manually in settings.json
+# Or manually in ~/.claude.json
 ```
 ```json
 {
@@ -159,11 +201,17 @@ You don't need to use these prefixes in conversation — just say "navigate to l
 The simplest way to add an MCP server:
 
 ```bash
-# Add to current project
+# Add to current project (local scope, default)
 claude mcp add playwright -- npx @playwright/mcp@latest
 
-# Add globally (all projects)
+# Add for all projects (user scope)
 claude mcp add --scope user playwright -- npx @playwright/mcp@latest
+
+# Add from a JSON config
+claude mcp add-json weather-api '{"type":"http","url":"https://api.weather.com/mcp"}'
+
+# Add with HTTP transport
+claude mcp add --transport http remote-api https://api.example.com/mcp
 
 # Verify what's configured
 claude mcp list
@@ -181,10 +229,10 @@ claude
 
 ### Option B: Manual JSON Configuration
 
-For more control (env vars, complex args), edit the settings file directly:
+For more control (env vars, complex args), edit the config file directly:
 
-- Global: `~/.claude/settings.json`
-- Project: `.claude/settings.json`
+- Local/User: `~/.claude.json`
+- Project (team-shared): `.mcp.json` in project root
 
 ```json
 {
@@ -201,6 +249,14 @@ For more control (env vars, complex args), edit the settings file directly:
 ```
 
 After editing, restart Claude Code for changes to take effect.
+
+### Windows Note
+
+On native Windows (not WSL), local MCP servers using `npx` require a `cmd /c` wrapper:
+
+```bash
+claude mcp add --transport stdio my-server -- cmd /c npx -y @some/mcp-package
+```
 
 ### Finding MCP Servers
 
@@ -257,15 +313,15 @@ If you find yourself rarely using certain MCP tools, consider removing that serv
 
 ---
 
-## Global vs Project-Level Configuration
+## Choosing the Right Scope
 
-| Use global (`~/.claude/settings.json`) when... | Use project-level (`.claude/settings.json`) when... |
-|---|---|
-| You want the tool available everywhere | The tool is specific to this project |
-| It's a general-purpose tool (like Playwright) | It needs project-specific env vars (like a DB URL) |
-| You always want it loaded | Not all projects need it |
+| Use **user** scope when... | Use **project** scope (`.mcp.json`) when... | Use **local** scope (default) when... |
+|---|---|---|
+| You want the tool everywhere | The whole team needs it | Only you need it for this project |
+| General-purpose (like Playwright) | Needs project-specific config | Has personal API keys or secrets |
+| You always want it loaded | Should be version-controlled | Default — just `claude mcp add` |
 
-**Recommendation:** Put Playwright in global settings (useful everywhere). Put project-specific servers (database tools, custom integrations) in project-level settings.
+**Recommendation:** Put Playwright in user scope (useful everywhere). Put team-shared servers in `.mcp.json` (committed to git with `${VAR}` placeholders for secrets). Use local scope (default) for everything else.
 
 ---
 
@@ -300,6 +356,12 @@ When MCP tool definitions exceed roughly **~10% of the total context budget**, C
 
 This is **fully automatic** — you don't need to configure anything. It keeps context lean when you have many MCP servers or servers with large tool counts.
 
+**Customizing the threshold:** Set `ENABLE_TOOL_SEARCH` to control behavior:
+- `auto` (default) — activates when tools exceed 10% of context
+- `auto:<N>` — custom threshold (e.g., `auto:5` for 5%)
+- `true` — always enabled
+- `false` — disabled, all tools loaded upfront
+
 ---
 
 ## MCP Resources
@@ -307,8 +369,10 @@ This is **fully automatic** — you don't need to configure anything. It keeps c
 MCP servers can expose **resources** (data sources like files, database records, or API responses) in addition to tools. Reference them in conversation using:
 
 ```
-@server-name:resource-name
+@server-name:protocol://resource/path
 ```
+
+Examples: `@github:issue://123`, `@docs:file://api/authentication`
 
 This tells Claude to fetch that resource from the named MCP server and include it in context.
 
@@ -326,15 +390,28 @@ Reserve MCP servers for capabilities that don't have a CLI equivalent (like Play
 
 ---
 
+## Limits and Timeouts
+
+| Setting | Default | Environment Variable |
+|---|---|---|
+| **Output warning** | 10,000 tokens | — |
+| **Output maximum** | 25,000 tokens | `MAX_MCP_OUTPUT_TOKENS` |
+| **Startup timeout** | Varies | `MCP_TIMEOUT` (milliseconds, e.g., `MCP_TIMEOUT=10000`) |
+
+If a tool returns output exceeding the max, it will be truncated. Increase `MAX_MCP_OUTPUT_TOKENS` if you need larger responses from MCP tools.
+
+---
+
 ## Troubleshooting
 
 | Issue | Solution |
 |---|---|
-| MCP tools not appearing | Check settings file syntax (valid JSON?). Restart Claude Code. Run `/mcp` to check status. |
+| MCP tools not appearing | Check config file syntax (valid JSON?). Restart Claude Code. Run `/mcp` to check status. |
 | "Browser not installed" error | Use `browser_install` tool, or run `npx playwright install` manually |
-| Server fails to start | Check that the command/package exists. Run the command manually to see errors. |
+| Server fails to start | Check that the command/package exists. Run the command manually to see errors. Set `MCP_TIMEOUT` for slow-starting servers. |
 | Tools are slow | MCP servers run as separate processes — network latency between Claude Code and the server is usually minimal, but the server's own operations (like browser automation) take real time. |
 | Too much context used | Remove MCP servers you don't actively need. Run `/mcp` to see per-server context costs. |
+| `npx` not working on Windows | Use `cmd /c npx` wrapper: `claude mcp add my-server -- cmd /c npx -y @some/package` |
 
 ---
 
@@ -343,16 +420,18 @@ Reserve MCP servers for capabilities that don't have a CLI equivalent (like Play
 | I want to... | Do this |
 |---|---|
 | Add Playwright browser tools | `claude mcp add --scope user playwright -- npx @playwright/mcp@latest` |
-| Add a custom MCP server | `claude mcp add <name> -- <command>` or edit settings.json |
+| Add a custom MCP server | `claude mcp add <name> -- <command>` or edit `~/.claude.json` / `.mcp.json` |
 | See what's configured | `claude mcp list` |
 | Remove an MCP server | `claude mcp remove <name>` |
 | Reduce context usage from MCP | Remove servers you rarely use |
 | Use MCP tools in conversation | Just describe what you want — Claude picks the right tool |
 | Check MCP status and context cost | `/mcp` inside a session |
 | Check which MCP tools are loaded | Ask Claude "what MCP tools do you have?" at session start |
-| Reference an MCP resource | `@server-name:resource-name` in conversation |
-| Use project-specific config | `claude mcp add <name> -- <command>` (without `--scope user`) |
-| Use global config | `claude mcp add --scope user <name> -- <command>` |
+| Reference an MCP resource | `@server:protocol://resource/path` in conversation |
+| Add from JSON config | `claude mcp add-json <name> '<json>'` |
+| Use local config (default) | `claude mcp add <name> -- <command>` |
+| Use project config (team) | Create `.mcp.json` in project root |
+| Use user config (all projects) | `claude mcp add --scope user <name> -- <command>` |
 
 ---
 

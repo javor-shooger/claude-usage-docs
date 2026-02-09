@@ -80,6 +80,8 @@ Generic advice is ignored. Specific rules are followed.
 
 This alone saves Claude from having to explore your package.json, tsconfig, and build scripts.
 
+> **Tip:** Including verification instructions is the single highest-leverage thing you can add. "Run `pnpm test` after changes" or "Run `dotnet build` to verify" lets Claude catch its own mistakes before reporting back.
+
 ### Highly recommended
 
 ```markdown
@@ -135,10 +137,12 @@ This alone saves Claude from having to explore your package.json, tsconfig, and 
 |---|---|---|
 | `~/.claude/CLAUDE.md` (global) | 5–15 lines | 30 lines |
 | `CLAUDE.md` (project root) | 15–50 lines | 100 lines |
-| `.claude/CLAUDE.md` (personal) | 5–15 lines | 30 lines |
+| `.claude/CLAUDE.md` (project-level) | 5–15 lines | 30 lines |
 | Each file in `.claude/rules/` | 10–30 lines | 50 lines |
 
 **Total across all files:** Try to stay under 150 lines combined. Every line beyond what's useful is wasted context.
+
+> **Warning:** If Claude keeps doing something you've explicitly told it not to, the file is probably too long and the rule is getting lost in noise. Trim aggressively. You can also emphasize critical rules with **IMPORTANT** or **YOU MUST** to improve adherence.
 
 ---
 

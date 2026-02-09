@@ -24,7 +24,7 @@ If you deny a tool call:
 
 ## Switching Modes
 
-Press **`Shift+Tab`** to cycle through modes during a session: Default → Auto-accept → Plan. You can also start in a specific mode: `claude --permission-mode plan`.
+Press **`Shift+Tab`** to cycle through modes during a session: Default → Auto-accept → Plan (when agent teams are active, the cycle also includes Delegate mode). You can also start in a specific mode: `claude --permission-mode plan`, or enter plan mode directly with `/plan`. To set a persistent default, add `"defaultMode": "plan"` (or `"acceptEdits"`, etc.) to your settings file.
 
 ---
 
@@ -102,11 +102,14 @@ Claude: "Fixed 12 strict mode errors across 8 files. Here's a summary..."
 
 **How to enter plan mode:**
 - Say: "plan this first", "enter plan mode", "design the approach before coding"
-- Claude calls `EnterPlanMode` and switches to read-only exploration
+- Use `/plan` to enter plan mode directly, or press `Shift+Tab` to cycle to it
+- Claude can also proactively enter plan mode via its `EnterPlanMode` tool when it determines a task needs planning
 - It investigates the codebase, designs an approach, and writes a plan
 - It calls `ExitPlanMode` when the plan is ready for your review
 - You approve, request changes, or reject
 - After approval, Claude implements the plan
+
+> **Note:** The official docs describe plan mode as a user-toggled permission mode via `/plan` or `Shift+Tab`. Claude also has `EnterPlanMode`/`ExitPlanMode` as internal tools, letting it proactively enter plan mode when appropriate. Both mechanisms work together.
 
 **What Claude CAN do in plan mode:**
 - Read files (Read, Glob, Grep)
@@ -167,6 +170,10 @@ Use `/permissions` to view and manage permission rules interactively. Rules come
 
 Rules are evaluated in order: **deny → ask → allow**. Deny always wins.
 
+**"Don't ask again" durations differ by tool type:**
+- **Bash commands** — "Yes, don't ask again" is **permanent** per project directory and command pattern
+- **File modifications** — "Yes, don't ask again" lasts only until **session end**
+
 ### Settings Files
 
 | File | Scope |
@@ -207,7 +214,7 @@ For the full permission rule reference, see the [official permissions documentat
 
 ### Sandboxing
 
-For stronger isolation, `/sandbox` enables OS-level filesystem and network restrictions for Bash commands. This is complementary to permissions — permissions control which tools Claude attempts to use, sandboxing restricts what Bash commands can actually access. See the [official sandboxing docs](https://code.claude.com/docs/en/sandboxing).
+For stronger isolation, `/sandbox` enables OS-level filesystem and network restrictions for Bash commands. This is complementary to permissions — permissions control which tools Claude attempts to use, sandboxing restricts what Bash commands can actually access. Currently supports macOS, Linux, and WSL2. WSL1 is not supported. Native Windows support is planned. See the [official sandboxing docs](https://code.claude.com/docs/en/sandboxing).
 
 ### The `--dangerously-skip-permissions` Flag
 

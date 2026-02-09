@@ -174,15 +174,19 @@ See @README.md for project overview and @package.json for available npm commands
 - Absolute and home-directory (`~/`) paths are supported
 - Imported files can recursively import others (max depth: 5)
 - Imports inside code blocks are ignored
-- First time Claude encounters imports in a project, it shows an approval dialog
+- First time Claude encounters imports in a project, it shows an approval dialog. **This is a one-time decision per project** — once declined, the dialog does not resurface and imports remain disabled.
 
 This is useful for keeping CLAUDE.md concise by referencing existing docs instead of duplicating them.
+
+> **Tip:** Use `--add-dir ../shared` to give Claude access to additional directories. Set `CLAUDE_CODE_ADDITIONAL_DIRECTORIES_CLAUDE_MD=1` to also load CLAUDE.md files from those directories.
 
 ---
 
 ## Auto Memory System
 
-Separate from CLAUDE.md files, Claude Code has an **auto memory** system that lets the agent itself record and retrieve notes across sessions.
+Separate from CLAUDE.md files, Claude Code has an **auto memory** system that automatically saves useful context — project patterns, key commands, your preferences, and lessons learned — across sessions. You can also tell Claude to save specific things, and you can edit the memory files directly at any time.
+
+> **Note:** Auto memory is being rolled out gradually. If you don't see it, opt in by setting `CLAUDE_CODE_DISABLE_AUTO_MEMORY=0` in your environment.
 
 ### Location
 
@@ -190,7 +194,7 @@ Separate from CLAUDE.md files, Claude Code has an **auto memory** system that le
 ~/.claude/projects/<project-identifier>/memory/
 ```
 
-The `<project-identifier>` is derived from your project path (e.g., `d--my-project` for `d:\my-project`).
+The `<project-identifier>` is derived from the **git repository root**, so all subdirectories within the same repo share one auto memory directory. Outside a git repo, the working directory is used instead.
 
 ### MEMORY.md — The Primary Memory File
 
@@ -199,7 +203,7 @@ The `<project-identifier>` is derived from your project path (e.g., `d--my-proje
 | **Location** | `~/.claude/projects/<project-id>/memory/MEMORY.md` |
 | **Loaded?** | **Always** — injected into the system prompt at session start |
 | **Size limit** | Lines after 200 are truncated — keep it concise |
-| **Written by** | Claude (the agent), not you |
+| **Written by** | Claude (the agent) — you can also edit it directly |
 | **Purpose** | Key learnings, patterns, and insights from past sessions |
 
 Claude is instructed to:
@@ -210,7 +214,7 @@ Claude is instructed to:
 
 You can also tell Claude to save something specific: "remember that we use pnpm, not npm" or "save to memory that the API tests require a local Redis instance."
 
-Use `/memory` to open your memory files in your system editor for direct editing.
+Use `/memory` to open a file selector that includes your auto memory and CLAUDE.md files — pick one to edit directly.
 
 ### Topic Files — Extended Memory
 
@@ -271,7 +275,7 @@ When a Claude Code session starts, the system prompt is assembled in this order:
    c. ~/.claude/rules/*                 (user-level rules)
    d. CLAUDE.md (project root + parents)(team/project instructions)
    e. CLAUDE.local.md                   (personal project prefs, auto-gitignored)
-   f. .claude/CLAUDE.md                 (personal project overrides)
+   f. .claude/CLAUDE.md                 (project-level, alternative location)
    g. .claude/rules/*                   (project rule files)
    h. Auto memory (MEMORY.md)           (agent's learned notes)
    i. Session memory                    (past session summaries)

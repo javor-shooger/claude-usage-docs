@@ -6,7 +6,7 @@ Practical strategies for managing your context budget effectively — the differ
 
 ## The Core Problem
 
-Claude Code has a **200K token context window** (or **1M** with the `[1m]` model suffix — e.g., `sonnet[1m]`). Everything competes for that space:
+Claude Code has a **200K token context window** (or **1M** with the `[1m]` model suffix — e.g., `sonnet[1m]`; note: the `[1m]` suffix is observed behavior and may not apply to all models). Everything competes for that space:
 
 - System prompt + tool definitions (~10–15K baseline)
 - CLAUDE.md files + memory (~1–5K)
@@ -35,7 +35,23 @@ The context fills up as you work. When it's full, the session either compacts (l
 
 ---
 
-## Strategy 1: Read Selectively
+## Strategy 1: Start Fresh Between Tasks
+
+The simplest and most effective context management technique: **run `/clear` between unrelated tasks** to reset context entirely.
+
+When you finish one task and start something different, the accumulated context from the first task is pure overhead — it doesn't help with the new task and takes up space. `/clear` gives you a clean 200K budget instantly.
+
+**When to `/clear`:**
+- Switching from one bug to a different, unrelated one
+- Finished exploring — now starting implementation
+- Claude seems confused or going in circles
+- You've corrected Claude more than twice on the same issue
+
+**What survives `/clear`:** CLAUDE.md, auto memory (MEMORY.md), and session memory summaries all reload. The only thing lost is the current conversation history.
+
+---
+
+## Strategy 2: Read Selectively
 
 **Don't read entire files when you only need part of them.**
 
@@ -49,7 +65,7 @@ The context fills up as you work. When it's full, the session either compacts (l
 
 ---
 
-## Strategy 2: Use Subagents to Protect Context
+## Strategy 3: Use Subagents to Protect Context
 
 Subagents (Task tool) get **their own isolated context window**. Only a compact summary returns to your main session.
 
@@ -74,7 +90,7 @@ This is the most powerful context management technique:
 
 ---
 
-## Strategy 3: Compact at the Right Time
+## Strategy 4: Compact at the Right Time
 
 **Compaction** summarizes older conversation turns to free up space. It happens automatically when context usage gets high, or you can trigger it manually with `/compact`.
 
@@ -99,9 +115,11 @@ Say: `/compact` or "compact the conversation"
 
 You can also provide a focus: `/compact focus on the auth refactor plan` — this hints at what the summary should prioritize preserving.
 
+**Tip:** You can add compaction instructions to your CLAUDE.md to guide what gets preserved: e.g., `"When compacting, always preserve the full list of modified files and the current plan."`
+
 ---
 
-## Strategy 4: Use Todo Lists as Persistent Memory
+## Strategy 5: Use Todo Lists as Persistent Memory
 
 The todo list (TodoWrite) acts as **short-term structured memory** that survives compaction better than conversation text.
 
@@ -114,7 +132,7 @@ The todo list (TodoWrite) acts as **short-term structured memory** that survives
 
 ---
 
-## Strategy 5: Structure Your Requests
+## Strategy 6: Structure Your Requests
 
 How you phrase things affects how much context gets used:
 
@@ -128,7 +146,7 @@ How you phrase things affects how much context gets used:
 
 ---
 
-## Strategy 6: Use Skills for On-Demand Loading
+## Strategy 7: Use Skills for On-Demand Loading
 
 Skills (`.claude/skills/`) only load their full content **when Claude determines they're relevant** or when you invoke them with a slash command. This keeps your base context lean.
 
@@ -139,11 +157,13 @@ Skills (`.claude/skills/`) only load their full content **when Claude determines
 
 **Example:** If you have API conventions that only matter when editing API routes, put them in a skill instead of CLAUDE.md. They'll load automatically when Claude works on API code, but won't consume context when you're working on the frontend.
 
+**Zero-cost skills:** Add `disable-model-invocation: true` to a skill's frontmatter to prevent Claude from auto-loading it. The skill is only invoked when you call it explicitly with a slash command — zero context cost until then.
+
 See [Extending Claude Code](extending-claude-code.md) for how to create skills.
 
 ---
 
-## Strategy 7: Parallelize with Background Tasks
+## Strategy 8: Parallelize with Background Tasks
 
 Background tasks (`run_in_background`) don't block your conversation flow:
 
@@ -155,7 +175,7 @@ This doesn't save context directly, but it saves **time**, letting you use the s
 
 ---
 
-## Strategy 8: Know When to Start Fresh
+## Strategy 9: Know When to Start Fresh
 
 Sometimes the best context management is a **new session**:
 
@@ -176,6 +196,7 @@ Starting a new session costs you the accumulated context, but you get:
 |---|---|
 | `/context` | Breakdown of what's consuming context space (messages, tools, system prompt) |
 | `/mcp` | Per-server context cost of MCP tools — useful for identifying expensive MCP integrations |
+| `/statusline` | Configure a persistent status line showing ongoing context usage at a glance |
 
 **MCP tool search:** When MCP tools exceed ~10% of your total context, Claude Code automatically defers them — listing tools on demand instead of loading them all at startup. This is automatic, but if context feels tight, check `/mcp` to see if a server is consuming too much.
 
@@ -183,9 +204,9 @@ Starting a new session costs you the accumulated context, but you get:
 
 ## Safety Net: Checkpointing
 
-Claude Code snapshots your files before every edit. If something goes wrong:
+Claude Code creates a checkpoint with every prompt you send. If something goes wrong:
 
-- **`Esc+Esc`** opens the rewind menu — jump back to any previous checkpoint
+- **`Esc+Esc`** opens the rewind menu — restore code, restore conversation, or summarize from a selected message
 - **`/rewind`** does the same thing
 
 This makes aggressive strategies safer. You can let Claude make broad changes knowing you can always roll back. This doesn't save context, but it reduces the cost of mistakes — you don't need to spend turns debugging a bad edit when you can just rewind.
@@ -203,11 +224,13 @@ Think of your 200K context as a budget:
  ───────
  145K  available for your session
 
- Comfortable zone:    0–70K used    (plenty of room)
- Watch zone:         70–110K used   (be selective with reads)
- Compact zone:      110–140K used   (consider compacting)
- Auto-compact:      140K+ used      (system compacts automatically)
+ Comfortable zone:    0–80K used    (plenty of room)
+ Watch zone:         80–130K used   (be selective with reads)
+ Compact zone:      130–170K used   (consider compacting manually)
+ Auto-compact:      ~190K used      (system compacts at ~95% capacity)
 ```
+
+> **Note:** Auto-compaction triggers at roughly **95% of context capacity** (~190K for a 200K window). Don't wait for it — manually compact earlier with `/compact` for better control over what gets preserved.
 
 ---
 
@@ -215,16 +238,18 @@ Think of your 200K context as a budget:
 
 | I want to... | Strategy |
 |---|---|
+| Reset context between tasks | `/clear` — simplest and most effective |
 | Explore a large codebase | Use an Explore subagent |
 | Find specific code | Grep first, then Read only the relevant file |
 | Read a huge file | Use offset/limit to read only the section you need |
 | Investigate a complex issue | Delegate to a subagent |
 | Keep track of multi-step work | Use TodoWrite as persistent anchoring |
 | Free up context mid-session | `/compact` (optionally with a focus hint) |
-| Start a fundamentally different task | Start a new session |
+| Start a fundamentally different task | `/clear` or start a new session |
 | Run a long command without blocking | Use `run_in_background` |
 | Keep specialized knowledge out of base context | Move it to skills (`.claude/skills/`) |
 | See what's consuming context | `/context` |
+| Monitor context continuously | `/statusline` |
 | Check MCP tool costs | `/mcp` |
 | Undo a bad edit safely | `Esc+Esc` to rewind |
 

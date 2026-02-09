@@ -14,8 +14,9 @@ Slash commands are typed directly into the input prompt. They are **built-in CLI
 | `/compact` | Manually compress conversation to free context. Optionally add a focus: `/compact focus on the auth work` |
 | `/clear` | Clear the conversation history and start fresh (same session) |
 | `/init` | Create a `CLAUDE.md` file in the current project root (analyzes your project to generate a starter) |
-| `/cost` | Show token usage and cost for the current session (API users) |
-| `/stats` | Show usage patterns (subscription users — Pro, Max, Teams) |
+| `/cost` | Show token usage and cost for the current session |
+| `/stats` | Visualize daily usage, session history, streaks, and model preferences |
+| `/usage` | Show plan usage limits and rate limit status (subscription users — Pro, Max, Teams) |
 | `/context` | Show what's consuming context space (tools, MCP servers, conversation) |
 | `/model` | Switch the model mid-session. Also configure effort level for extended thinking. |
 | `/memory` | Open your memory files (CLAUDE.md + auto memory) in your system editor |
@@ -31,6 +32,14 @@ Slash commands are typed directly into the input prompt. They are **built-in CLI
 | `/plugin` | Browse and install plugins from the marketplace |
 | `/sandbox` | Enable OS-level sandboxing for Bash commands |
 | `/fast` | Toggle fast mode (same model, faster output) |
+| `/plan` | Enter plan mode directly (Claude analyzes without modifying files) |
+| `/login` | Log in or switch accounts |
+| `/logout` | Sign out of your current account |
+| `/theme` | Change the color theme and toggle syntax highlighting |
+| `/vim` | Enable vim-style keybindings for the input editor |
+| `/keybindings` | Customize keyboard shortcuts (opens `~/.claude/keybindings.json`) |
+| `/output-style` | Change Claude's response style (Default, Explanatory, Learning, or custom) |
+| `/tasks` | List and manage background tasks |
 | `/quit` or `/exit` | End the session |
 | `/status` | Show version, model, account, and connectivity info |
 | `/debug` | Troubleshoot the current session (reads debug log) |
@@ -85,15 +94,15 @@ You can create your own skills by adding `SKILL.md` files in `.claude/skills/`. 
 | Action | Keys |
 |---|---|
 | Submit message | `Enter` |
-| New line (without submitting) | `Shift+Enter`, `\` + `Enter`, or `Ctrl+J` |
+| New line (without submitting) | `Shift+Enter`, `Option+Enter` (macOS), `\` + `Enter`, or `Ctrl+J` |
 
-> **Note:** `Shift+Enter` works out of the box in iTerm2, WezTerm, Ghostty, and Kitty. For other terminals (VS Code, Alacritty), run `/terminal-setup` to install the binding. `\` + `Enter` works everywhere.
+> **Note:** `Shift+Enter` works out of the box in iTerm2, WezTerm, Ghostty, and Kitty. For other terminals (VS Code, Alacritty, Zed, Warp), run `/terminal-setup` to install the binding. `\` + `Enter` works everywhere.
 
 ### During Claude's Response
 
 | Action | Keys |
 |---|---|
-| Interrupt / stop Claude | `Escape` |
+| Interrupt / stop Claude | `Escape` or `Ctrl+C` |
 | Rewind to a previous checkpoint | `Escape` twice (Esc+Esc) or `/rewind` |
 | Background a running task | `Ctrl+B` |
 
@@ -107,7 +116,7 @@ Pressing Escape once while Claude is generating will stop it mid-response. Press
 | Toggle verbose/thinking display | `Ctrl+O` |
 | Toggle extended thinking on/off | `Alt+T` (Windows/Linux) or `Option+T` (macOS) |
 | Switch model without clearing prompt | `Alt+P` (Windows/Linux) or `Option+P` (macOS) |
-| Edit plan in your text editor | `Ctrl+G` (when in plan mode) |
+| Open input/plan in your text editor | `Ctrl+G` |
 | Toggle task list visibility | `Ctrl+T` |
 
 ### General Controls
@@ -126,6 +135,14 @@ Use `Shift+Enter` (or `\` + `Enter` in any terminal) to add new lines to your me
 - Providing structured instructions with bullet points
 - Pasting code snippets
 - Giving multi-part requests
+
+### Prompt Suggestions
+
+After Claude responds, a grayed-out suggestion appears in the prompt input — based on your conversation and git history. Press `Tab` to accept or just start typing to ignore it. Disable with `CLAUDE_CODE_ENABLE_PROMPT_SUGGESTION=false`.
+
+### Output Styles
+
+Use `/output-style` to change how Claude formats responses. Built-in styles include **Default**, **Explanatory** (adds educational "Insights" during coding), and **Learning** (adds TODO markers for hands-on practice). You can also create custom styles as markdown files in `.claude/output-styles/`.
 
 ---
 
@@ -372,7 +389,8 @@ Claude sees your selection and knows exactly what "this" refers to. This works f
 |---|---|
 | Free up context | `/compact` (optionally with a focus hint) |
 | Check what's using context | `/context` |
-| Check token cost | `/cost` (API) or `/stats` (subscription) |
+| Check token cost | `/cost` |
+| Check subscription usage | `/usage` (subscription) or `/stats` |
 | Start fresh without quitting | `/clear` |
 | Create project instructions | `/init` |
 | Edit memory/CLAUDE.md files | `/memory` |

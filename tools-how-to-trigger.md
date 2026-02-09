@@ -39,7 +39,7 @@ These are phrases and patterns that naturally cause each tool to be used without
 | Tool | Implicit Triggers |
 |---|---|
 | **TodoWrite** | "track these tasks", "make a checklist", "let's plan the steps" (also used automatically for complex multi-step work) |
-| **EnterPlanMode** | "let's plan this first", "design the approach before coding", "I want to review the plan first" |
+| **EnterPlanMode** | "let's plan this first", "design the approach before coding", "I want to review the plan first". Also: `/plan` or `Shift+Tab` to cycle to plan mode. |
 | **AskUserQuestion** | Used automatically when clarification is needed. You can say: "ask me before deciding" |
 
 ### Browser (Playwright)
@@ -81,9 +81,40 @@ When you want to guarantee a specific tool is used, reference it by name or use 
 
 ---
 
+## Direct Input Methods
+
+### `!` Bash Prefix
+
+Prefix a command with `!` to run it directly in your shell without Claude interpreting it:
+```
+! npm test
+! git status
+! docker ps
+```
+The output is added to conversation context so Claude can see the result.
+
+### Image Pasting
+
+Paste images from your clipboard directly into the prompt:
+- `Ctrl+V` (most terminals)
+- `Cmd+V` (iTerm2 on macOS)
+- `Alt+V` (Windows)
+
+Useful for sharing screenshots of errors, UI mockups, or visual context.
+
+### Piping Data to Claude
+
+From the command line, pipe file content or command output directly:
+```bash
+cat error.log | claude -p "explain this error"
+git diff | claude -p "review these changes"
+```
+
+---
+
 ## @ File References (Inline Content)
 
-You can include file content directly in your message using `@` references — no Read tool call needed.
+You can include file content directly in your message using `@` references — no Read tool call needed. Type `@` to trigger file path autocomplete in the terminal.
 
 | Syntax | What It Does |
 |---|---|
@@ -127,7 +158,7 @@ Say: **"plan this before coding"** or **"enter plan mode"**
 - Forces a review step before any code is written
 
 ### 8. Skill Invocation
-Use slash commands: **"/commit"**, **"/review-pr"**, etc.
+Use slash commands: **"/commit"**, **"/review"**, etc.
 - These invoke registered skills via the Skill tool
 - Custom skills in `.claude/skills/` are also invocable as slash commands (e.g., `/fix-issue 1234`)
 - See [Extending Claude Code](extending-claude-code.md) for details on creating custom skills

@@ -89,7 +89,7 @@ For complex tasks, instead of trying to specify everything upfront, let Claude a
 
 > "I want to add OAuth2 support. Interview me about the requirements before starting."
 
-**Why it works:** You don't have to anticipate every detail Claude will need. Claude asks targeted clarifying questions — which providers, which flows, where to store tokens, etc. — so the implementation matches your actual requirements. This is especially valuable for tasks where you know the goal but haven't nailed down the specifics.
+**Why it works:** You don't have to anticipate every detail Claude will need. Claude uses the AskUserQuestion tool to ask targeted, structured questions — which providers, which flows, where to store tokens, etc. — so the implementation matches your actual requirements. This is especially valuable for tasks where you know the goal but haven't nailed down the specifics.
 
 ### Pattern 7: Give Claude Verification Criteria
 
@@ -125,7 +125,12 @@ The more files Claude might touch, the more important it is to scope:
 
 This prevents Claude from creating duplicate code or reinventing existing utilities.
 
-### Pro tip: Use `@` to include file content directly
+### Pro tip: Provide rich context
+
+- **`@` file references** — type `@` followed by a file path to include its content directly in your message
+- **URLs** — give URLs for documentation and API references. Use `/permissions` to allowlist frequently-used domains.
+- **Images** — paste images (`Ctrl+V`) for visual context: screenshots of errors, UI mockups, expected vs actual output
+- **External editor** — press `Ctrl+G` to open your prompt in an external text editor for long, structured prompts
 
 You can type `@` followed by a file path to include that file's content in your message. This gives Claude precise context without vague descriptions:
 
@@ -156,6 +161,10 @@ Sometimes the first result isn't right. Here's how to course-correct efficiently
 
 > "Actually, use the approach from Pattern X instead."
 > "Forget the last change — go back to the version before and instead just add input validation."
+
+### When to start fresh
+
+If you've corrected Claude more than twice on the same issue, run `/clear` and start a new conversation with a more specific prompt. Iterating in a polluted context often makes things worse — a clean start with better instructions is faster.
 
 ---
 

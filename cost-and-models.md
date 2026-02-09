@@ -54,12 +54,25 @@ Claude Code supports multiple models that you can switch between. They differ in
 
 ### Model Aliases
 
-| Alias | What It Does |
+| Alias | Points To |
 |---|---|
+| `default` | The default model for your account (usually Sonnet) |
+| `sonnet` | Latest Claude Sonnet |
+| `opus` | Latest Claude Opus |
+| `haiku` | Latest Claude Haiku |
 | `sonnet[1m]` | Sonnet with 1M token context window (5x the default 200K) |
-| `opusplan` | Automatically uses Opus during plan mode, then switches to Sonnet for implementation. Combines Opus-quality planning with Sonnet-cost execution. |
+| `opusplan` | Automatically uses Opus during plan mode, then switches to Sonnet for implementation |
 
 Set via `/model` — e.g., `/model opusplan`.
+
+### Model Configuration Priority
+
+When multiple model settings exist, this is the resolution order (highest priority first):
+
+1. **`/model` during session** — overrides everything for this session
+2. **`claude --model` at startup** — sets the model for this session
+3. **`ANTHROPIC_MODEL` environment variable** — default for all sessions
+4. **`model` field in settings file** — persistent default
 
 ### Switching Models
 
@@ -86,13 +99,20 @@ Extended thinking is **enabled by default** — Claude reasons through complex p
 | **View thinking** | `Ctrl+O` toggles verbose mode to see reasoning |
 | **Disable globally** | `/config` → toggle thinking mode |
 
-On Opus 4.6, thinking uses **adaptive reasoning** — the model dynamically allocates thinking tokens based on your effort level. On other models, thinking uses a fixed budget of up to ~32K tokens.
+On Opus 4.6, thinking uses **adaptive reasoning** — the model dynamically allocates thinking tokens based on your effort level. On other models, thinking uses a fixed budget of up to **31,999 tokens**.
 
 **Thinking tokens are billed as output tokens.** For simple tasks where deep reasoning isn't needed, lower the effort level or disable thinking to save costs.
 
+You can control the thinking budget with the `MAX_THINKING_TOKENS` environment variable — e.g., `MAX_THINKING_TOKENS=8000` for a lower budget.
+
 ### Fast Mode
 
-Toggle with `/fast`. Uses the same model but optimizes for faster output. Useful when speed matters more than thoroughness.
+Toggle with `/fast`. Uses the **same Claude Opus 4.6 model** (not a different model) but optimizes for faster output. The setting persists across sessions.
+
+**Key details:**
+- Faster output speed at the same quality level
+- Useful when speed matters more than thoroughness
+- Auto-switches back to standard Opus 4.6 if fast mode encounters issues
 
 ---
 
@@ -180,6 +200,8 @@ If running a command with potentially large output:
 | `/status` | Version, model, account, and connectivity info |
 
 Check `/cost` periodically, especially during long sessions, to understand where your budget is going.
+
+> **Note:** Claude Code uses a small number of tokens for background processing (conversation summarization for `--resume`, status checks) even when idle — typically under **$0.04 per session**.
 
 ---
 
