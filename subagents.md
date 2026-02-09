@@ -48,6 +48,7 @@ Main session (200K context)
 |---|---|
 | **Tools available** | Read, Glob, Grep, Bash (read-only), WebFetch, WebSearch — all tools except Task, Edit, Write, NotebookEdit |
 | **Cannot** | Edit files, write files, spawn sub-subagents |
+| **Default model** | **Haiku** (not inherited from parent) — this is why Explore agents are fast and cheap |
 | **Best for** | "How does X work?", "Find where Y is defined", "What files handle Z?" |
 | **Thoroughness** | Specify in your prompt: "quick", "medium", or "very thorough" |
 

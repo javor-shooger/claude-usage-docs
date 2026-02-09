@@ -67,7 +67,7 @@ Analyze and fix the GitHub issue: $ARGUMENTS.
 5. Create a commit and push a PR
 ```
 
-Usage: `/fix-issue 1234`
+Usage: `/fix-issue 1234` — the `1234` becomes `$ARGUMENTS` in the skill template.
 
 The `disable-model-invocation: true` flag means Claude won't auto-invoke this skill — you have to trigger it manually. This is good for workflows that make changes.
 
@@ -93,6 +93,10 @@ Hooks are **shell scripts that run automatically** at specific points in Claude'
 | **PreToolUse** | Before Claude uses a tool | Validate a Bash command, block writes to certain files |
 | **PostToolUse** | After Claude uses a tool | Run linter after every file edit |
 | **Stop** | When Claude finishes a response | Run tests after implementation |
+| **SessionStart** | Session begins | Load env vars or project context |
+| **UserPromptSubmit** | You submit a prompt | Add context to every prompt |
+
+For the full list of hook events, see the [official hooks reference](https://code.claude.com/docs/en/hooks).
 
 ### Simple Example
 

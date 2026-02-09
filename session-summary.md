@@ -2,7 +2,7 @@
 
 ## What Makes Up a Session's Context Window
 
-Claude Code operates within a context window (typically 200K tokens, or 1M in beta). Each API call assembles and sends the following layers:
+Claude Code operates within a context window (200K tokens by default, or 1M with the `[1m]` model suffix — e.g., `sonnet[1m]`). Each API call assembles and sends the following layers:
 
 ### 1. System Prompt (~3–4K tokens)
 Core identity instructions — tells Claude it's an interactive CLI coding assistant, defines behavior rules and safety guidelines.

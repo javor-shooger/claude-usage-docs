@@ -148,6 +148,7 @@ Claude: [exits plan mode, begins implementation]
 
 | Mode | What It Does | When to Use |
 |---|---|---|
+| **acceptEdits** | Auto-accepts file edit permissions (Read, Edit, Write), but still prompts for Bash and other tools | A middle ground — trust Claude with code changes, but review shell commands |
 | **dontAsk** | Auto-denies all tools unless pre-approved via `/permissions` | Scripting where you want minimal interaction |
 | **Delegate** | Coordination-only — Claude works through [agent team](https://code.claude.com/docs/en/agent-teams) members, no direct edits | Advanced: multi-agent workflows |
 | **bypassPermissions** | Skips all permission checks | **Dangerous** — only in sandboxed/isolated environments |

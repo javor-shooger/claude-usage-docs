@@ -32,7 +32,12 @@ Slash commands are typed directly into the input prompt. They are **built-in CLI
 | `/sandbox` | Enable OS-level sandboxing for Bash commands |
 | `/fast` | Toggle fast mode (same model, faster output) |
 | `/quit` or `/exit` | End the session |
-| `/review` | Review a PR (provide PR number or URL) |
+| `/login` | Log in or switch accounts |
+| `/status` | Show version, model, account, and connectivity info |
+| `/debug` | Troubleshoot the current session (reads debug log) |
+| `/doctor` | Check health of your Claude Code installation |
+| `/export` | Export conversation to a file or clipboard |
+| `/copy` | Copy the last assistant response to clipboard |
 | `/bug` | Report a bug |
 
 ### Slash Commands vs Skills
@@ -82,7 +87,9 @@ You can create your own skills by adding `SKILL.md` files in `.claude/skills/`. 
 | Action | Keys |
 |---|---|
 | Submit message | `Enter` |
-| New line (without submitting) | `Shift+Enter` |
+| New line (without submitting) | `Shift+Enter`, `\` + `Enter`, or `Ctrl+J` |
+
+> **Note:** `Shift+Enter` works out of the box in iTerm2, WezTerm, Ghostty, and Kitty. For other terminals (VS Code, Alacritty), run `/terminal-setup` to install the binding. `\` + `Enter` works everywhere.
 
 ### During Claude's Response
 
@@ -101,11 +108,23 @@ Pressing Escape once while Claude is generating will stop it mid-response. Press
 | Cycle permission modes | `Shift+Tab` (cycles: default → auto-accept → plan) |
 | Toggle verbose/thinking display | `Ctrl+O` |
 | Toggle extended thinking on/off | `Alt+T` (Windows/Linux) or `Option+T` (macOS) |
+| Switch model without clearing prompt | `Alt+P` (Windows/Linux) or `Option+P` (macOS) |
 | Edit plan in your text editor | `Ctrl+G` (when in plan mode) |
+| Toggle task list visibility | `Ctrl+T` |
+
+### General Controls
+
+| Action | Keys |
+|---|---|
+| Show all keyboard shortcuts | `?` |
+| Exit Claude Code | `Ctrl+D` |
+| Clear terminal screen (keeps conversation) | `Ctrl+L` |
+| Reverse search command history | `Ctrl+R` |
+| Open input in your text editor | `Ctrl+G` |
 
 ### Multi-Line Input
 
-Use `Shift+Enter` to add new lines to your message before submitting. This is useful for:
+Use `Shift+Enter` (or `\` + `Enter` in any terminal) to add new lines to your message before submitting. This is useful for:
 - Providing structured instructions with bullet points
 - Pasting code snippets
 - Giving multi-part requests
@@ -237,7 +256,7 @@ You can also just describe files naturally — Claude will use the Read tool to 
 ### Drag and Drop / Paste
 
 - **Drag and drop** files into the Claude Code input in supported terminals/IDEs
-- **Copy and paste** images with `Ctrl+V` (not `Cmd+V` on Mac)
+- **Copy and paste** images with `Ctrl+V`, `Cmd+V` (iTerm2), or `Alt+V` (Windows)
 
 ### Image and PDF Support
 
@@ -247,6 +266,20 @@ Claude can read images (PNG, JPG) and PDFs:
 "look at screenshot.png"
 "read the first 5 pages of spec.pdf"
 ```
+
+---
+
+## Bash Mode (`!` Prefix)
+
+Type `!` before a command to run it directly in your shell without Claude interpreting it:
+
+```
+! npm test
+! git status
+! docker ps
+```
+
+The command output is added to conversation context, so Claude can see and discuss the result. Useful for quick shell commands when you want to control exactly what runs.
 
 ---
 

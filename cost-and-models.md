@@ -52,6 +52,15 @@ Claude Code supports multiple models that you can switch between. They differ in
 | **Sonnet 4.5** | Good balance of capability and speed, handles most tasks well | Less capable on very complex reasoning | Medium | General development — the recommended default |
 | **Haiku 4.5** | Fastest, cheapest, good at straightforward tasks | Less capable on complex reasoning | Lowest | Simple edits, running commands, quick questions |
 
+### Model Aliases
+
+| Alias | What It Does |
+|---|---|
+| `sonnet[1m]` | Sonnet with 1M token context window (5x the default 200K) |
+| `opusplan` | Automatically uses Opus during plan mode, then switches to Sonnet for implementation. Combines Opus-quality planning with Sonnet-cost execution. |
+
+Set via `/model` — e.g., `/model opusplan`.
+
 ### Switching Models
 
 Use `/model` to switch mid-session. Common strategy:
@@ -63,6 +72,8 @@ Switch to Sonnet for implementation
   ↓
 Switch to Haiku for running tests, formatting, simple fixes
 ```
+
+Or use `/model opusplan` to automate this — it handles the Opus→Sonnet switching for you.
 
 ### Extended Thinking
 
@@ -166,7 +177,7 @@ If running a command with potentially large output:
 | Command | What it shows |
 |---|---|
 | `/cost` | Token usage and cost for the current session |
-| `/status` | Session info including context usage |
+| `/status` | Version, model, account, and connectivity info |
 
 Check `/cost` periodically, especially during long sessions, to understand where your budget is going.
 

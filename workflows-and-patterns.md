@@ -346,6 +346,8 @@ Phase 5: Commit
 
 **Why it works:** Opus costs significantly more than Sonnet, which costs more than Haiku. By matching the model to the task complexity, you get Opus-quality planning with Sonnet-cost implementation and Haiku-cost test runs.
 
+**Shortcut:** Use `/model opusplan` to automate this. The `opusplan` alias automatically uses Opus during plan mode and switches to Sonnet for implementation — no manual `/model` switching needed.
+
 **See also:** [Cost Awareness & Model Selection](cost-and-models.md) for detailed cost strategies.
 
 ---

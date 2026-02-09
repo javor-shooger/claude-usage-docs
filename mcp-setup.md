@@ -356,4 +356,4 @@ Reserve MCP servers for capabilities that don't have a CLI equivalent (like Play
 
 ---
 
-For the full MCP configuration reference, see the [official MCP documentation](https://code.claude.com/docs/en/mcp-servers).
+For the full MCP configuration reference, see the [official MCP documentation](https://code.claude.com/docs/en/mcp).

@@ -101,9 +101,16 @@ This is the recommended way to add personal project-specific preferences. Becaus
 - Skip the E2E tests when running locally — they need Docker
 ```
 
-### 3b. `.claude/CLAUDE.md` — Project Personal (Alternative)
+### 3b. `.claude/CLAUDE.md` — Project (Alternative Location)
 
-Same purpose as `CLAUDE.local.md`, but lives in the `.claude/` directory. Either location works — `CLAUDE.local.md` is simpler since it's auto-gitignored.
+| Property | Detail |
+|---|---|
+| **Location** | `.claude/CLAUDE.md` in the project |
+| **Scope** | Applies to **this project only** |
+| **Shared?** | Your choice — you can commit it to git |
+| **Git tracked?** | Your choice |
+
+This is an alternative location for project-level instructions, equivalent to the root `CLAUDE.md`. Some teams prefer it to keep the project root clean. Either location works.
 
 ---
 
@@ -306,7 +313,7 @@ When a Claude Code session starts, the system prompt is assembled in this order:
 | `~/.claude/rules/*` | All projects | No | No | Always | You |
 | `CLAUDE.md` (project root) | This project | Yes (team) | Yes | Always | You / team |
 | `CLAUDE.local.md` | This project | No (personal) | Auto-gitignored | Always | You |
-| `.claude/CLAUDE.md` | This project | No (personal) | No | Always | You |
+| `.claude/CLAUDE.md` | This project | Your choice | Your choice | Always | You |
 | `.claude/rules/*` | This project | Your choice | Your choice | Always | You / team |
 | Child dir `CLAUDE.md` | Subdirectory | Your choice | Your choice | On demand | You / team |
 | `~/.claude/projects/<id>/memory/MEMORY.md` | This project | No | No | Always (first 200 lines) | Claude (agent) |

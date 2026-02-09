@@ -6,7 +6,7 @@ Practical strategies for managing your context budget effectively — the differ
 
 ## The Core Problem
 
-Claude Code has a **200K token context window**. Everything competes for that space:
+Claude Code has a **200K token context window** (or **1M** with the `[1m]` model suffix — e.g., `sonnet[1m]`). Everything competes for that space:
 
 - System prompt + tool definitions (~10–15K baseline)
 - CLAUDE.md files + memory (~1–5K)
@@ -230,4 +230,4 @@ Think of your 200K context as a budget:
 
 ---
 
-For the full context management reference, see the [official context documentation](https://code.claude.com/docs/en/context).
+For the full context management reference, see the [official context documentation](https://code.claude.com/docs/en/how-claude-code-works).
