@@ -32,13 +32,11 @@ Slash commands are typed directly into the input prompt. They are **built-in CLI
 | `/sandbox` | Enable OS-level sandboxing for Bash commands |
 | `/fast` | Toggle fast mode (same model, faster output) |
 | `/quit` or `/exit` | End the session |
-| `/login` | Log in or switch accounts |
 | `/status` | Show version, model, account, and connectivity info |
 | `/debug` | Troubleshoot the current session (reads debug log) |
 | `/doctor` | Check health of your Claude Code installation |
 | `/export` | Export conversation to a file or clipboard |
 | `/copy` | Copy the last assistant response to clipboard |
-| `/bug` | Report a bug |
 
 ### Slash Commands vs Skills
 
