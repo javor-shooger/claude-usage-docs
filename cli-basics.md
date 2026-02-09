@@ -13,10 +13,24 @@ Slash commands are typed directly into the input prompt. They are **built-in CLI
 | `/help` | Show help and available commands |
 | `/compact` | Manually compress conversation to free context. Optionally add a focus: `/compact focus on the auth work` |
 | `/clear` | Clear the conversation history and start fresh (same session) |
-| `/init` | Create a `CLAUDE.md` file in the current project root |
-| `/cost` | Show token usage and cost for the current session |
-| `/status` | Show session info (model, context usage, project) |
-| `/model` | Switch the model mid-session (e.g., to Sonnet for cheaper tasks) |
+| `/init` | Create a `CLAUDE.md` file in the current project root (analyzes your project to generate a starter) |
+| `/cost` | Show token usage and cost for the current session (API users) |
+| `/stats` | Show usage patterns (subscription users — Pro, Max, Teams) |
+| `/context` | Show what's consuming context space (tools, MCP servers, conversation) |
+| `/model` | Switch the model mid-session. Also configure effort level for extended thinking. |
+| `/memory` | Open your memory files (CLAUDE.md + auto memory) in your system editor |
+| `/agents` | View, create, edit, and manage custom subagents |
+| `/resume` | Switch to a different conversation (opens session picker) |
+| `/rename` | Give the current session a memorable name (e.g., `/rename auth-refactor`) |
+| `/rewind` | Open the rewind menu to restore conversation and/or code to a previous checkpoint |
+| `/config` | Toggle global settings (e.g., thinking mode on/off) |
+| `/permissions` | View and manage tool permission rules |
+| `/mcp` | Check configured MCP servers and their per-server context costs |
+| `/statusline` | Configure the status bar shown at the bottom of the terminal |
+| `/hooks` | Interactive hook configuration |
+| `/plugin` | Browse and install plugins from the marketplace |
+| `/sandbox` | Enable OS-level sandboxing for Bash commands |
+| `/fast` | Toggle fast mode (same model, faster output) |
 | `/quit` or `/exit` | End the session |
 | `/review` | Review a PR (provide PR number or URL) |
 | `/bug` | Report a bug |
@@ -50,13 +64,14 @@ Skills vary by configuration. Common built-in skills:
 | Skill | What It Does |
 |---|---|
 | `/commit` | Analyzes staged changes, drafts a commit message following your project's conventions, creates the commit |
+| `/commit-push-pr` | Commits, pushes, and opens a PR in one step |
 | `/review` | Reviews a PR — analyzes changes, identifies issues, provides feedback |
 
 Additional skills may be available depending on your setup — they appear in system reminders during your session.
 
 ### Custom Skills
 
-You can create your own skills by adding prompt files. Custom skills work the same way — they expand into a prompt that Claude executes. This lets you create reusable workflows specific to your project (e.g., a skill that runs your full test + lint + build pipeline, or one that generates changelog entries).
+You can create your own skills by adding `SKILL.md` files in `.claude/skills/`. Each skill is a directory with a `SKILL.md` file containing YAML frontmatter and instructions. Skills load on demand (not at session start), keeping your base context lean. See [Extending Claude Code](extending-claude-code.md) for details.
 
 ---
 
@@ -74,11 +89,19 @@ You can create your own skills by adding prompt files. Custom skills work the sa
 | Action | Keys |
 |---|---|
 | Interrupt / stop Claude | `Escape` |
+| Rewind to a previous checkpoint | `Escape` twice (Esc+Esc) or `/rewind` |
+| Background a running task | `Ctrl+B` |
 
-Pressing Escape while Claude is generating will stop it mid-response. This is useful when:
-- You see Claude going in the wrong direction
-- The output is already long enough
-- You want to redirect with a new instruction
+Pressing Escape once while Claude is generating will stop it mid-response. Pressing Escape **twice** opens the **rewind menu** — letting you restore conversation and/or code to any previous checkpoint.
+
+### Mode & Display Shortcuts
+
+| Action | Keys |
+|---|---|
+| Cycle permission modes | `Shift+Tab` (cycles: default → auto-accept → plan) |
+| Toggle verbose/thinking display | `Ctrl+O` |
+| Toggle extended thinking on/off | `Alt+T` (Windows/Linux) or `Option+T` (macOS) |
+| Edit plan in your text editor | `Ctrl+G` (when in plan mode) |
 
 ### Multi-Line Input
 
@@ -118,10 +141,20 @@ The `-p` (print) flag runs a single prompt and exits — useful for scripting or
 ### Resume Previous Session
 
 ```bash
-claude --resume
+claude --continue          # Resume the most recent conversation
+claude --resume            # Open a session picker or resume by name
+claude --resume auth-refactor   # Resume a named session directly
+claude --from-pr 123       # Resume sessions linked to a specific PR
 ```
 
-Continues the most recent session with its full context intact.
+### Other Useful Flags
+
+```bash
+claude --add-dir ../shared  # Give Claude access to an additional directory
+claude --fork-session       # Branch off a resumed session without affecting the original
+claude --model opus         # Start with a specific model
+claude --permission-mode plan  # Start in plan mode
+```
 
 ---
 
@@ -177,9 +210,23 @@ Each "turn" may involve **multiple API calls** if Claude uses tools — each too
 
 ## Working with Files
 
-### Providing File Context
+### `@` References (Quick Context)
 
-You don't need to manually open or paste files. Just reference them:
+Use `@` to include files or directories directly in your message — their content is sent immediately without waiting for Claude to read them:
+
+```
+"Explain the logic in @src/utils/auth.js"
+"What's the structure of @src/components?"
+"Compare @file1.js and @file2.js"
+```
+
+- File paths can be relative or absolute
+- Directory references show file listings, not full contents
+- You can reference multiple files in a single message
+
+### Natural Language References
+
+You can also just describe files naturally — Claude will use the Read tool to fetch them:
 
 ```
 "look at src/auth.ts"
@@ -187,11 +234,10 @@ You don't need to manually open or paste files. Just reference them:
 "read package.json"
 ```
 
-Claude will use the Read tool to fetch the file contents.
+### Drag and Drop / Paste
 
-### Drag and Drop
-
-In supported terminals/IDEs, you can drag files into the Claude Code input to reference them.
+- **Drag and drop** files into the Claude Code input in supported terminals/IDEs
+- **Copy and paste** images with `Ctrl+V` (not `Cmd+V` on Mac)
 
 ### Image and PDF Support
 
@@ -213,6 +259,20 @@ Claude can see the output of commands it runs, but it **cannot see your terminal
 - Provide a screenshot if it's visual
 
 ---
+
+## Where Claude Code Runs
+
+Claude Code runs in multiple environments. The most common:
+
+| Platform | Best For |
+|---|---|
+| **Terminal (CLI)** | Core experience — full control, scripting, SSH access |
+| **VS Code extension** | IDE integration — inline diffs, selection context, clickable references |
+| **Desktop app** | Standalone app with diff review and parallel sessions via git worktrees |
+| **Claude Code on the web** | Browser-based at [claude.ai/code](https://claude.ai/code) — no local setup, parallel tasks |
+| **JetBrains plugin** | IntelliJ, PyCharm, WebStorm with IDE diff viewing |
+
+For details on each platform, see the [official platform docs](https://code.claude.com/docs/en/overview#use-claude-code-everywhere).
 
 ## CLI vs VS Code Extension
 
@@ -279,15 +339,25 @@ Claude sees your selection and knows exactly what "this" refers to. This works f
 
 | I want to... | Do this |
 |---|---|
-| Free up context | `/compact` |
-| Check how much context I've used | `/cost` or `/status` |
+| Free up context | `/compact` (optionally with a focus hint) |
+| Check what's using context | `/context` |
+| Check token cost | `/cost` (API) or `/stats` (subscription) |
 | Start fresh without quitting | `/clear` |
 | Create project instructions | `/init` |
+| Edit memory/CLAUDE.md files | `/memory` |
 | Stop Claude mid-response | `Escape` |
+| Undo Claude's changes | `Esc+Esc` or `/rewind` |
+| Cycle permission modes | `Shift+Tab` |
+| Toggle fast mode | `/fast` |
 | Write a multi-line message | `Shift+Enter` for new lines |
 | Quick one-off question | `claude -p "question"` (CLI only) |
-| Continue last session | `claude --resume` (CLI only) |
+| Continue last session | `claude --continue` (CLI only) |
+| Pick from recent sessions | `claude --resume` or `/resume` |
+| Name a session | `/rename auth-refactor` |
 | Switch to a cheaper model | `/model` |
+| Include a file in your message | `@path/to/file` |
+| Manage subagents | `/agents` |
+| Browse plugins | `/plugin` |
 | End the session | `/quit` |
 | Ask about highlighted code | Select code in editor, then ask (VS Code) |
 | Jump to a file Claude mentions | Click the file link in the response (VS Code) |

@@ -22,9 +22,15 @@ If you deny a tool call:
 
 ---
 
+## Switching Modes
+
+Press **`Shift+Tab`** to cycle through modes during a session: Default → Auto-accept → Plan. You can also start in a specific mode: `claude --permission-mode plan`.
+
+---
+
 ## Interaction Modes
 
-Claude Code offers different modes that control the balance between autonomy and oversight. The right mode depends on your task, trust level, and how closely you want to supervise.
+Claude Code offers several modes. The three you'll use most often:
 
 ### 1. Ask Mode (Default/Interactive)
 
@@ -138,24 +144,69 @@ Claude: [exits plan mode, begins implementation]
 
 ---
 
+### Other Modes
+
+| Mode | What It Does | When to Use |
+|---|---|---|
+| **dontAsk** | Auto-denies all tools unless pre-approved via `/permissions` | Scripting where you want minimal interaction |
+| **Delegate** | Coordination-only — Claude works through [agent team](https://code.claude.com/docs/en/agent-teams) members, no direct edits | Advanced: multi-agent workflows |
+| **bypassPermissions** | Skips all permission checks | **Dangerous** — only in sandboxed/isolated environments |
+
+---
+
 ## Permission Configuration
 
-### Settings Files
+### Manage with `/permissions`
 
-Permissions can be configured in settings files:
+Use `/permissions` to view and manage permission rules interactively. Rules come in three types:
+
+- **Allow** — tool runs without asking
+- **Ask** — prompts for confirmation
+- **Deny** — blocks the tool entirely
+
+Rules are evaluated in order: **deny → ask → allow**. Deny always wins.
+
+### Settings Files
 
 | File | Scope |
 |---|---|
 | `~/.claude/settings.json` | Global — applies to all projects |
 | `.claude/settings.json` | Project — applies to this project |
 
-### Configurable Behaviors
+### Permission Rule Syntax
 
-Through settings you can configure:
-- Which tools are auto-allowed
-- Which tools always require approval
-- MCP server connections (which add their tools)
-- Custom agent definitions
+Rules follow the format `Tool` or `Tool(specifier)`:
+
+```json
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run *)",
+      "Bash(git commit *)"
+    ],
+    "deny": [
+      "Bash(git push *)"
+    ]
+  }
+}
+```
+
+| Example Rule | What It Matches |
+|---|---|
+| `Bash` | All Bash commands |
+| `Bash(npm run *)` | Any command starting with `npm run ` |
+| `Bash(git commit *)` | Git commit commands |
+| `Read(./.env)` | Reading the .env file |
+| `WebFetch(domain:example.com)` | Fetch requests to example.com |
+| `mcp__puppeteer__*` | All tools from the puppeteer MCP server |
+
+Read/Edit rules follow [gitignore patterns](https://git-scm.com/docs/gitignore): `*` matches within a directory, `**` matches recursively.
+
+For the full permission rule reference, see the [official permissions documentation](https://code.claude.com/docs/en/permissions).
+
+### Sandboxing
+
+For stronger isolation, `/sandbox` enables OS-level filesystem and network restrictions for Bash commands. This is complementary to permissions — permissions control which tools Claude attempts to use, sandboxing restricts what Bash commands can actually access. See the [official sandboxing docs](https://code.claude.com/docs/en/sandboxing).
 
 ### The `--dangerously-skip-permissions` Flag
 
@@ -163,6 +214,7 @@ The CLI supports a flag that **bypasses all permission checks**. As the name imp
 - Every tool call runs without any approval
 - Useful for CI/CD pipelines or fully automated workflows
 - **Not recommended for interactive use** — removes all safety guardrails
+- Organizations can disable this with managed settings
 
 ---
 
@@ -184,11 +236,11 @@ The CLI supports a flag that **bypasses all permission checks**. As the name imp
 
 ## Mode Switching During a Session
 
-You can **switch modes mid-session**:
+Press **`Shift+Tab`** to cycle modes, or tell Claude what you want:
 
 - Start in Ask mode to understand the problem
-- Switch to Plan mode when you decide on an approach ("plan this first")
-- After plan approval, work in Auto-accept for the implementation
+- Press `Shift+Tab` twice to enter Plan mode for the approach
+- After plan approval, press `Shift+Tab` to auto-accept for implementation
 - Switch back to Ask mode for the final review/commit
 
 This is often the most effective workflow: **high oversight for decisions, low oversight for execution**.
@@ -209,6 +261,8 @@ Regardless of mode, Claude Code has built-in safety behaviors:
 
 5. **No brute-forcing** — if an approach is blocked, Claude tries alternatives rather than retrying the same failing action.
 
+6. **Checkpointing** — every file edit is snapshotted. Press `Esc+Esc` to rewind if something goes wrong.
+
 ---
 
 ## Quick Reference
@@ -222,7 +276,10 @@ Regardless of mode, Claude Code has built-in safety behaviors:
 | I want to... | Do this... |
 |---|---|
 | Review every action | Use Ask mode (default) |
-| Let Claude work fast | Use Auto-accept mode |
-| Design before coding | Say "plan this first" |
-| Switch to less oversight | Approve tools, or switch to auto-accept |
-| Switch to more oversight | Say "ask me before doing anything" |
+| Let Claude work fast | Use Auto-accept mode (`Shift+Tab`) |
+| Design before coding | Plan mode (`Shift+Tab` twice) or say "plan this first" |
+| Switch modes quickly | `Shift+Tab` to cycle |
+| Allow specific commands permanently | `/permissions` → add an allow rule |
+| Block a tool entirely | `/permissions` → add a deny rule |
+| Enable OS-level isolation | `/sandbox` |
+| Undo something Claude did | `Esc+Esc` to rewind |

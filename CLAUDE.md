@@ -10,27 +10,30 @@ A personal reference library documenting how Claude Code works — its tools, me
 - **Don't overwrite existing files without reading them first.** The user has built these across multiple sessions — always read before editing.
 - **Use the same style as existing files:** markdown tables, concise bullet points, practical examples, clear section headers.
 
-## Existing Files
+## Existing Files (15 files)
 See `index.md` for the full list in recommended reading order. Key files:
-- `session-summary.md` — How sessions, context windows, and state management work
-- `memory-and-instructions.md` — Detailed guide to CLAUDE.md files, auto memory, and session memory
-- `tools-reference.md` — Complete reference of all 39 tools (17 built-in + 22 Playwright MCP)
-- `tools-how-to-trigger.md` — Practical guide on what to say to trigger each tool
-- `context-management.md` — Practical strategies for managing the context budget
-- `subagents.md` — Deep dive on the Task tool and agent types
-- `permissions-and-modes.md` — Permission model and interaction modes (Ask, Auto-accept, Plan)
-- `workflows-and-patterns.md` — Common workflows and recipes for real tasks
-- `cli-basics.md` — Slash commands, keyboard shortcuts, session lifecycle
-- `mcp-setup.md` — MCP server configuration and management
-- `custom-agents.md` — Reusable session personas and how they differ from subagents
-- `prompt-crafting.md` — How to write effective prompts for Claude Code
-- `cost-and-models.md` — Token costs, model selection, optimization strategies
+- `cli-basics.md` — Slash commands, keyboard shortcuts, `@` references, platforms
+- `session-summary.md` — Sessions, context window, checkpointing, compaction
+- `permissions-and-modes.md` — Ask/Auto-accept/Plan modes, permission rules, sandboxing
+- `memory-and-instructions.md` — CLAUDE.md hierarchy, `@` imports, rules, auto memory
 - `writing-effective-claude-md.md` — How to write good CLAUDE.md instructions
+- `tools-reference.md` — Complete reference of all 39+ tools with context cost estimates
+- `tools-how-to-trigger.md` — What to say to trigger each tool, `@` file references
+- `prompt-crafting.md` — Prompt patterns, scoping, letting Claude interview you
+- `context-management.md` — Strategies: selective reading, subagents, skills, compaction
+- `cost-and-models.md` — Token costs, model selection, extended thinking, fast mode
+- `subagents.md` — Task tool deep dive, agent types, custom subagents
+- `mcp-setup.md` — MCP server configuration, tool search, resources
+- `extending-claude-code.md` — Skills, hooks, and plugins overview
+- `custom-agents.md` — Custom subagents in `.claude/agents/`
+- `workflows-and-patterns.md` — Recipes for common tasks (always last in reading order)
 
 ## When the User Wants to Add New Topics
 - Suggest a new file rather than appending to an existing one (unless it clearly belongs there)
 - Start by reviewing what's already documented to avoid duplication
 - Cross-reference related files where appropriate
+- **Check the official docs first.** Browse https://code.claude.com/docs/en/ to verify current behavior and discover details before writing. Our docs are a curated learning path, not a mirror — but they must be accurate.
+- **Add links to official docs.** When a topic has a full official page, link to it inline: "For details, see the [official X documentation](https://code.claude.com/docs/en/X)." This keeps our docs concise while giving readers a path to dig deeper.
 
 ## Workflows Maintenance Rule
 When adding or updating a topic doc, check if `workflows-and-patterns.md` should be updated too:

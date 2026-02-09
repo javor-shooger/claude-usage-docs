@@ -11,6 +11,13 @@ Claude Code charges based on **tokens processed**. Every API call sends the full
 - **Input tokens** — everything sent to the API (the full context)
 - **Output tokens** — Claude's response (including tool calls and reasoning)
 
+### Typical Costs
+
+- Average: **~$6 per developer per day** (API users)
+- 90th percentile: under $12/day
+- Monthly with Sonnet: **~$100–200/developer**
+- Subscription users (Pro, Max, Teams): usage included in subscription — use `/stats` to view patterns instead of `/cost`.
+
 ### Why Costs Grow During a Session
 
 Each turn sends the **entire conversation history** again. Turn 1 might send 15K tokens. Turn 10 might send 80K tokens — because it includes everything from turns 1–9 plus all tool results.
@@ -41,9 +48,9 @@ Claude Code supports multiple models that you can switch between. They differ in
 
 | Model | Strengths | Weaknesses | Cost | Best For |
 |---|---|---|---|---|
-| **Opus** | Most capable reasoning, best at complex tasks, most thorough | Slowest, most expensive | Highest | Complex features, architectural decisions, tricky bugs, nuanced refactoring |
-| **Sonnet** | Good balance of capability and speed, handles most tasks well | Less capable than Opus on very complex reasoning | Medium | General development work, most coding tasks, good default |
-| **Haiku** | Fastest, cheapest, good at straightforward tasks | Less capable on complex reasoning, may miss nuances | Lowest | Simple edits, formatting, running commands, quick questions, mechanical tasks |
+| **Opus 4.6** | Most capable reasoning, adaptive thinking, best at complex tasks | Slowest, most expensive | Highest | Complex features, architectural decisions, tricky bugs |
+| **Sonnet 4.5** | Good balance of capability and speed, handles most tasks well | Less capable on very complex reasoning | Medium | General development — the recommended default |
+| **Haiku 4.5** | Fastest, cheapest, good at straightforward tasks | Less capable on complex reasoning | Lowest | Simple edits, running commands, quick questions |
 
 ### Switching Models
 
@@ -56,6 +63,25 @@ Switch to Sonnet for implementation
   ↓
 Switch to Haiku for running tests, formatting, simple fixes
 ```
+
+### Extended Thinking
+
+Extended thinking is **enabled by default** — Claude reasons through complex problems step-by-step before responding. This uses additional tokens but significantly improves quality for complex tasks.
+
+| Setting | How |
+|---|---|
+| **Adjust depth** | `/model` → set effort level: low, medium, high (default) |
+| **Toggle on/off** | `Alt+T` (Windows/Linux) or `Option+T` (macOS) |
+| **View thinking** | `Ctrl+O` toggles verbose mode to see reasoning |
+| **Disable globally** | `/config` → toggle thinking mode |
+
+On Opus 4.6, thinking uses **adaptive reasoning** — the model dynamically allocates thinking tokens based on your effort level. On other models, thinking uses a fixed budget of up to ~32K tokens.
+
+**Thinking tokens are billed as output tokens.** For simple tasks where deep reasoning isn't needed, lower the effort level or disable thinking to save costs.
+
+### Fast Mode
+
+Toggle with `/fast`. Uses the same model but optimizes for faster output. Useful when speed matters more than thoroughness.
 
 ---
 
@@ -179,3 +205,7 @@ The most cost-efficient pattern is:
 | Explore without inflating context | Use a subagent: "Use an explore agent to..." |
 | Keep turns cheap | Be specific, scope your requests, avoid vague exploration |
 | Start cheap again | New session for a new task |
+
+---
+
+For detailed cost management strategies (hooks for preprocessing, team rate limits, agent team costs), see the [official cost documentation](https://code.claude.com/docs/en/costs).

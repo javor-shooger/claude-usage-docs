@@ -83,6 +83,22 @@ If you have a preference for how something should be done, say it upfront:
 
 **Why it works:** Frontloading key context means Claude doesn't need to explore to learn your stack. Especially useful at the start of a session.
 
+### Pattern 6: Let Claude Interview You
+
+For complex tasks, instead of trying to specify everything upfront, let Claude ask the questions:
+
+> "I want to add OAuth2 support. Interview me about the requirements before starting."
+
+**Why it works:** You don't have to anticipate every detail Claude will need. Claude asks targeted clarifying questions — which providers, which flows, where to store tokens, etc. — so the implementation matches your actual requirements. This is especially valuable for tasks where you know the goal but haven't nailed down the specifics.
+
+### Pattern 7: Give Claude Verification Criteria
+
+Tell Claude how to verify its own work so you don't have to check manually:
+
+> "Add the email service and verify it works by running the tests in `tests/email.test.ts`."
+
+**Why it works:** Claude runs the tests (or build, or linter) itself and fixes any failures before reporting back. This reduces back-and-forth and catches issues in the same turn they're introduced.
+
 ---
 
 ## Scoping Techniques
@@ -108,6 +124,14 @@ The more files Claude might touch, the more important it is to scope:
 > "Use the existing DatabaseClient from src/lib/db.ts"
 
 This prevents Claude from creating duplicate code or reinventing existing utilities.
+
+### Pro tip: Use `@` to include file content directly
+
+You can type `@` followed by a file path to include that file's content in your message. This gives Claude precise context without vague descriptions:
+
+> "Fix the bug in @src/services/auth.ts — the JWT validation on line 45 isn't checking token expiry."
+
+Claude receives the actual file content inline, so you skip the "read this file first" step entirely. This is especially useful when you know exactly which file is relevant.
 
 ---
 
@@ -168,6 +192,8 @@ Be honest about it:
 
 > "Before implementing, ask me about any design decisions you're unsure about."
 
+See also **Pattern 6: Let Claude Interview You** above for a more structured version of this.
+
 ---
 
 ## Common Mistakes
@@ -206,3 +232,10 @@ Be honest about it:
 | Limit the scope | "Only modify [X]. Don't touch [Y]." |
 | Follow existing patterns | "Follow the pattern in [file]" |
 | Course-correct | Say what's specifically wrong + what to do differently |
+| Clarify requirements first | "Interview me about the requirements before starting." |
+| Self-verify the work | "Do [X] and verify by running [tests/build/linter]." |
+| Give precise file context | Use `@path/to/file` inline to include file content |
+
+---
+
+For more prompting techniques, see the [official best practices](https://code.claude.com/docs/en/best-practices).

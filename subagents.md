@@ -229,12 +229,25 @@ This avoids re-doing the initial exploration when you have follow-up questions.
 
 ---
 
+## Custom Subagents
+
+Beyond the built-in types above, you can **create your own subagents** with custom prompts, tool restrictions, and model overrides. Custom subagents are defined as markdown files with YAML frontmatter in `.claude/agents/` (project-level) or `~/.claude/agents/` (user-level).
+
+Claude can delegate to custom subagents automatically based on their description, or you can request them explicitly: "Use the code-reviewer subagent to check this module."
+
+Create and manage them with `/agents`, or add files manually.
+
+See [Custom Subagents](custom-agents.md) for the full guide, or the [official subagents documentation](https://code.claude.com/docs/en/sub-agents) for advanced features like hooks, persistent memory, and skills injection.
+
+---
+
 ## What Subagents Cannot Do
 
 - **Subagents cannot spawn their own subagents** — no recursive agent trees
 - **Explore and Plan agents cannot edit files** — they are read-only
-- **Subagents don't see your conversation history** (unless specified for certain types) — provide full context in the prompt
-- **Results are one-way** — the subagent returns a result, but cannot ask you questions mid-task
+- **Subagents don't see your conversation history** — provide full context in the prompt
+- **Foreground subagents** can pass permission prompts and clarifying questions through to you. **Background subagents** auto-deny anything not pre-approved and cannot ask questions.
+- **MCP tools** are not available in background subagents
 
 ---
 
@@ -248,6 +261,7 @@ This avoids re-doing the initial exploration when you have follow-up questions.
 | Run commands | Bash | "Run the test suite and summarize any failures" |
 | Do complex multi-step research | general-purpose | "Research how to integrate Stripe with our existing payment module" |
 | Ask about Claude Code itself | claude-code-guide | "How do I configure MCP servers in Claude Code?" |
+| Create a custom subagent | (any custom type) | See [Custom Subagents](custom-agents.md) |
 
 | I want to... | Parameter |
 |---|---|
@@ -256,3 +270,4 @@ This avoids re-doing the initial exploration when you have follow-up questions.
 | Continue a previous agent | `resume: "<agent-id>"` |
 | Limit agent runtime | `max_turns: 5` |
 | Run multiple agents at once | Ask for parallel execution in your message |
+| Create my own subagent | `/agents` or add `.md` file to `.claude/agents/` |

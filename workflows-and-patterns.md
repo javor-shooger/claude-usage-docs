@@ -180,15 +180,16 @@ Or manually: `"Commit these changes"` — works, but `/commit` produces more con
 Step 1: Verify your work
   "Run the tests and build"
 
-Step 2: Commit
+Step 2: Commit + PR
   /commit
   → Skill handles analysis, message drafting, and commit creation
 
-Step 3: Create PR
   "Create a pull request"
   → Claude creates a PR with title, summary, and test plan
   → Returns the PR URL
 ```
+
+**Shortcut:** If you have a `/commit-push-pr` skill set up, it can handle commit + push + PR creation in one step.
 
 ### PR Review
 ```
@@ -357,7 +358,12 @@ Phase 5: Commit
 
 Create `.claude/agents/code-reviewer.md`:
 ```markdown
-You are a senior code reviewer. When reviewing code:
+---
+name: code-reviewer
+description: Senior code reviewer — checks correctness, security, and maintainability
+tools: [Read, Glob, Grep, Bash, Task]
+---
+When reviewing code:
 - Check for correctness, security, and maintainability
 - Flag any OWASP top 10 vulnerabilities
 - Verify error handling for all async operations
@@ -385,7 +391,31 @@ Step 3: Summarize
 
 **Why it works:** The custom agent loads your review criteria automatically. Subagents handle the heavy exploration, keeping your review session context clean for the actual review work.
 
-**See also:** [Custom Agents](custom-agents.md) for setup details.
+**See also:** [Custom Subagents](custom-agents.md) for setup details.
+
+---
+
+## Workflow 12: Rewind & Retry
+
+**For:** When Claude's implementation went wrong and you want to try a different approach.
+
+```
+Step 1: Realize the approach isn't working
+  → Claude has made several edits that aren't what you wanted
+
+Step 2: Rewind
+  Press Esc+Esc (or use /rewind)
+  → Choose a checkpoint from before the bad changes
+  → All file edits are rolled back to that point
+
+Step 3: Retry with better guidance
+  "Try a different approach — instead of X, do Y"
+  → Claude starts fresh from the clean state
+```
+
+**Why it works:** Without rewind, you'd need Claude to manually undo changes (spending context) or start a new session. Rewind is instant and free — it restores file snapshots without consuming any tokens.
+
+**Tip:** Rewind is especially valuable in auto-accept mode, where Claude may make several changes before you notice a problem.
 
 ---
 
@@ -438,7 +468,8 @@ Step 3: Summarize
 | Wrapping up work | PR / Commit Flow (`/commit`, `/review`) |
 | Multi-session project | Persistent Task File |
 | Budget-conscious feature work | Cost-Efficient Feature Build |
-| Regular code reviews | Code Review Session (custom agent) |
+| Regular code reviews | Code Review Session (custom subagent) |
+| Claude went the wrong direction | Rewind & Retry (`Esc+Esc`) |
 
 | Situation | Mode / Model to Use |
 |---|---|
@@ -449,3 +480,5 @@ Step 3: Summarize
 | Complex reasoning or architecture | Opus |
 | Standard coding tasks | Sonnet |
 | Running commands, simple edits | Haiku |
+| Switching between modes quickly | `Shift+Tab` to cycle |
+| Undoing bad changes | `Esc+Esc` to rewind |

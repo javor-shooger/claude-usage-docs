@@ -128,7 +128,22 @@ How you phrase things affects how much context gets used:
 
 ---
 
-## Strategy 6: Parallelize with Background Tasks
+## Strategy 6: Use Skills for On-Demand Loading
+
+Skills (`.claude/skills/`) only load their full content **when Claude determines they're relevant** or when you invoke them with a slash command. This keeps your base context lean.
+
+| Approach | Context cost |
+|---|---|
+| Put everything in CLAUDE.md | Loaded every session, every turn |
+| Move specialized knowledge to skills | Only loaded when needed |
+
+**Example:** If you have API conventions that only matter when editing API routes, put them in a skill instead of CLAUDE.md. They'll load automatically when Claude works on API code, but won't consume context when you're working on the frontend.
+
+See [Extending Claude Code](extending-claude-code.md) for how to create skills.
+
+---
+
+## Strategy 7: Parallelize with Background Tasks
 
 Background tasks (`run_in_background`) don't block your conversation flow:
 
@@ -140,7 +155,7 @@ This doesn't save context directly, but it saves **time**, letting you use the s
 
 ---
 
-## Strategy 7: Know When to Start Fresh
+## Strategy 8: Know When to Start Fresh
 
 Sometimes the best context management is a **new session**:
 
@@ -152,6 +167,28 @@ Starting a new session costs you the accumulated context, but you get:
 - A clean 200K budget
 - Session memory summaries from the previous session
 - CLAUDE.md and auto memory carrying forward the important bits
+
+---
+
+## Checking What's Using Context
+
+| Command | What it shows |
+|---|---|
+| `/context` | Breakdown of what's consuming context space (messages, tools, system prompt) |
+| `/mcp` | Per-server context cost of MCP tools — useful for identifying expensive MCP integrations |
+
+**MCP tool search:** When MCP tools exceed ~10% of your total context, Claude Code automatically defers them — listing tools on demand instead of loading them all at startup. This is automatic, but if context feels tight, check `/mcp` to see if a server is consuming too much.
+
+---
+
+## Safety Net: Checkpointing
+
+Claude Code snapshots your files before every edit. If something goes wrong:
+
+- **`Esc+Esc`** opens the rewind menu — jump back to any previous checkpoint
+- **`/rewind`** does the same thing
+
+This makes aggressive strategies safer. You can let Claude make broad changes knowing you can always roll back. This doesn't save context, but it reduces the cost of mistakes — you don't need to spend turns debugging a bad edit when you can just rewind.
 
 ---
 
@@ -186,3 +223,11 @@ Think of your 200K context as a budget:
 | Free up context mid-session | `/compact` (optionally with a focus hint) |
 | Start a fundamentally different task | Start a new session |
 | Run a long command without blocking | Use `run_in_background` |
+| Keep specialized knowledge out of base context | Move it to skills (`.claude/skills/`) |
+| See what's consuming context | `/context` |
+| Check MCP tool costs | `/mcp` |
+| Undo a bad edit safely | `Esc+Esc` to rewind |
+
+---
+
+For the full context management reference, see the [official context documentation](https://code.claude.com/docs/en/context).

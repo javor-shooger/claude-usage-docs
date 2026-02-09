@@ -13,6 +13,8 @@ A good CLAUDE.md file makes Claude behave as if it already knows your project. I
 - What patterns does the codebase follow?
 - What should I avoid doing?
 
+**Tip:** Run `/init` to generate a starter CLAUDE.md based on your project structure. It analyzes your codebase to detect build systems, test frameworks, and code patterns. Then refine it over time.
+
 ---
 
 ## Principles
@@ -123,6 +125,7 @@ This alone saves Claude from having to explore your package.json, tsconfig, and 
 | Obvious things | "Use git for version control" — Claude already knows. |
 | Duplicated info | If it's in your README, reference it: "See README.md for setup instructions." |
 | Comments about the CLAUDE.md itself | "This file tells Claude how to work" — wastes tokens. |
+| Specialized workflow instructions | Move these to skills (`.claude/skills/`) — they load on demand instead of every session. See [Extending Claude Code](extending-claude-code.md). |
 
 ---
 
@@ -226,6 +229,7 @@ requests to the appropriate microservice...
 - **Remove stale info.** If you finished the auth refactor, remove the "currently working on" note.
 - **Review quarterly.** Skim through and ask: "Is Claude still following this? Is anything outdated?"
 - **Check after issues.** If Claude does something wrong repeatedly, add a rule to prevent it.
+- **Use `@` imports for large references.** Instead of pasting docs into CLAUDE.md, import them: `See @docs/api.md for API conventions.` Imports resolve relative to the CLAUDE.md file.
 
 ---
 
@@ -239,3 +243,7 @@ requests to the appropriate microservice...
 | Should I commit it? | Yes — project root `CLAUDE.md` should be in git |
 | How often to update? | When conventions change or Claude gets something wrong |
 | What's the biggest mistake? | Writing documentation instead of instructions |
+
+---
+
+For the full official guide on CLAUDE.md best practices, see the [official best practices documentation](https://code.claude.com/docs/en/best-practices#write-an-effective-claudemd).

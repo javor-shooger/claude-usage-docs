@@ -81,6 +81,20 @@ When you want to guarantee a specific tool is used, reference it by name or use 
 
 ---
 
+## @ File References (Inline Content)
+
+You can include file content directly in your message using `@` references — no Read tool call needed.
+
+| Syntax | What It Does |
+|---|---|
+| `@src/auth.ts` | Sends the full content of `src/auth.ts` as part of your message |
+| `@path/to/file.json` | Works with any file path relative to the project root |
+| `@src/utils/` | Includes all files in the `src/utils/` directory |
+
+This is useful when you want Claude to see specific files up front without waiting for a tool call. Just type `@` followed by the path in your prompt.
+
+---
+
 ## Pro Tips
 
 ### 1. Force Parallel Execution
@@ -115,6 +129,12 @@ Say: **"plan this before coding"** or **"enter plan mode"**
 ### 8. Skill Invocation
 Use slash commands: **"/commit"**, **"/review-pr"**, etc.
 - These invoke registered skills via the Skill tool
+- Custom skills in `.claude/skills/` are also invocable as slash commands (e.g., `/fix-issue 1234`)
+- See [Extending Claude Code](extending-claude-code.md) for details on creating custom skills
+
+### 9. Manage Custom Subagents
+Use **/agents** to create and manage custom subagents from the CLI.
+- See [Custom Subagents](custom-agents.md) for details
 
 ---
 
@@ -135,3 +155,7 @@ Use slash commands: **"/commit"**, **"/review-pr"**, etc.
 | Plan before coding | "plan this first" |
 | Run things in parallel | "do X and Y in parallel" |
 | Use a sub-agent | "use an explore agent to find..." |
+| Include a file in your prompt | `@src/auth.ts` in your message |
+| Include a directory | `@src/utils/` in your message |
+| Invoke a custom skill | `/fix-issue 1234` |
+| Manage custom subagents | `/agents` |

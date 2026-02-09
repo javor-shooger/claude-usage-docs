@@ -283,15 +283,58 @@ Or manually delete the server entry from your settings file. Either way, restart
 
 ---
 
+## Checking MCP Status
+
+Use the `/mcp` slash command inside a session to see:
+- Which MCP servers are connected or errored
+- Per-server context cost (how many tokens each server's tool definitions consume)
+- Total MCP overhead on your context budget
+
+From the CLI (outside a session), `claude mcp list` shows configured servers.
+
+---
+
+## MCP Tool Search (Automatic Deferral)
+
+When MCP tool definitions exceed roughly **~10% of the total context budget**, Claude Code automatically switches to **deferred loading**. Instead of injecting all tool schemas into the system prompt at startup, it lists tools on demand — only loading the schema for a tool when it's actually needed.
+
+This is **fully automatic** — you don't need to configure anything. It keeps context lean when you have many MCP servers or servers with large tool counts.
+
+---
+
+## MCP Resources
+
+MCP servers can expose **resources** (data sources like files, database records, or API responses) in addition to tools. Reference them in conversation using:
+
+```
+@server-name:resource-name
+```
+
+This tells Claude to fetch that resource from the named MCP server and include it in context.
+
+---
+
+## Tip: Prefer CLI Tools Over MCP When Available
+
+For services that already have good CLI tools — like `gh` (GitHub), `aws` (AWS), `docker`, `kubectl` — prefer using them via Bash rather than adding an MCP server:
+
+- **Simpler** — no server process to manage
+- **No context overhead** — CLI tools don't add tool definitions to your context budget
+- **No configuration** — if the CLI is installed and authenticated, it just works
+
+Reserve MCP servers for capabilities that don't have a CLI equivalent (like Playwright's browser automation).
+
+---
+
 ## Troubleshooting
 
 | Issue | Solution |
 |---|---|
-| MCP tools not appearing | Check settings file syntax (valid JSON?). Restart Claude Code. |
+| MCP tools not appearing | Check settings file syntax (valid JSON?). Restart Claude Code. Run `/mcp` to check status. |
 | "Browser not installed" error | Use `browser_install` tool, or run `npx playwright install` manually |
 | Server fails to start | Check that the command/package exists. Run the command manually to see errors. |
 | Tools are slow | MCP servers run as separate processes — network latency between Claude Code and the server is usually minimal, but the server's own operations (like browser automation) take real time. |
-| Too much context used | Remove MCP servers you don't actively need |
+| Too much context used | Remove MCP servers you don't actively need. Run `/mcp` to see per-server context costs. |
 
 ---
 
@@ -305,6 +348,12 @@ Or manually delete the server entry from your settings file. Either way, restart
 | Remove an MCP server | `claude mcp remove <name>` |
 | Reduce context usage from MCP | Remove servers you rarely use |
 | Use MCP tools in conversation | Just describe what you want — Claude picks the right tool |
+| Check MCP status and context cost | `/mcp` inside a session |
 | Check which MCP tools are loaded | Ask Claude "what MCP tools do you have?" at session start |
+| Reference an MCP resource | `@server-name:resource-name` in conversation |
 | Use project-specific config | `claude mcp add <name> -- <command>` (without `--scope user`) |
 | Use global config | `claude mcp add --scope user <name> -- <command>` |
+
+---
+
+For the full MCP configuration reference, see the [official MCP documentation](https://code.claude.com/docs/en/mcp-servers).

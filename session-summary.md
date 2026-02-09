@@ -14,13 +14,18 @@ Claude Code ships with 17 built-in tools: `Read`, `Write`, `Edit`, `Bash`, `Grep
 Project-specific instructions that persist across sessions, loaded from a hierarchy:
 - `~/.claude/CLAUDE.md` — global, user-level
 - `CLAUDE.md` in project root — project-level, shared with team
+- `CLAUDE.local.md` — project-level, personal (auto-gitignored)
 - `.claude/CLAUDE.md` — project-level, personal
-- `.claude/rules/` — additional rule files, always loaded at startup
+- `.claude/rules/` — additional rule files (can have path-specific scoping)
+- `~/.claude/rules/` — user-level rule files
 
-These provide persistent context about project conventions, tech stack, and workflows.
+CLAUDE.md files in parent directories above your working directory are loaded automatically. CLAUDE.md files in child directories load on-demand when Claude reads files there. Files can import other files using `@path/to/file` syntax.
 
-### 4. Custom Agent Definitions (small)
-If custom agents are defined in `.claude/agents/`, their descriptions and tool lists are loaded so Claude knows when to delegate.
+### 4. Custom Subagent Definitions (small)
+If custom subagents are defined in `.claude/agents/` or `~/.claude/agents/`, their descriptions are loaded so Claude knows when to delegate.
+
+### 4b. Skill Descriptions (small)
+If skills are defined in `.claude/skills/`, their descriptions are loaded (but full content loads on demand, not at startup).
 
 ### 5. Session Memory (past sessions)
 Summaries of relevant past sessions are injected in a `<session-memory>` block. These are explicitly marked as potentially outdated — only brief summaries, not full transcripts.
@@ -43,13 +48,17 @@ Space reserved for Claude's next response, including extended thinking.
 
 - **Files are NOT pre-loaded.** Claude doesn't read your whole codebase upfront. It uses tools (Read, Grep, Glob) to pull in files on-demand. Each file read adds to the conversation history.
 
-- **Compaction** kicks in automatically around 75–92% context usage. A lighter model (Haiku) summarizes the conversation, compressing older turns while preserving key details. Can be triggered manually with `/compact`.
+- **Compaction** kicks in automatically when context gets high. It summarizes the conversation, compressing older turns while preserving key decisions and code. Can be triggered manually with `/compact` — optionally with a focus: `/compact focus on the API changes`. Use `/context` to see what's consuming space.
+
+- **Checkpointing** — before every file edit, Claude snapshots the current state. Press `Esc+Esc` or run `/rewind` to open the rewind menu and restore conversation, code, or both to any previous checkpoint. This is local to your session, separate from git. See [official checkpointing docs](https://code.claude.com/docs/en/checkpointing) for details.
 
 - **Subagents (Task tool)** get their own isolated context window. Only a summary result returns to the main agent, keeping the parent context clean.
 
 - **Todo lists** function as short-term memory within a session — a structured plan that persists through compaction, acting as a reminder of goals and progress.
 
 - **Prompt caching** ensures the system prompt and tool definitions (unchanged between turns) are cached server-side to reduce cost and latency.
+
+- **Skills** load on demand — Claude sees their descriptions at startup, but full content only enters context when a skill is actually used. This keeps the base context lean.
 
 ---
 
@@ -78,6 +87,16 @@ Space reserved for Claude's next response, including extended thinking.
 | **History sent** | Full conversation (every message, response, tool result) | Only brief summaries in `<session-memory>` |
 | **Growth** | Accumulates until compaction compresses it | Fresh start with minimal carry-over |
 | **State** | Grows with every turn | Previous transcripts stored locally as JSONL |
+
+---
+
+## Session Management
+
+- **Sessions are per-directory.** Each new session is tied to where you launched Claude. When you resume, you only see sessions from that directory.
+- **Name your sessions** with `/rename auth-refactor` so you can find them later with `claude --resume auth-refactor`.
+- **Resume** with `claude --continue` (most recent) or `claude --resume` (session picker).
+- **Fork** with `claude --continue --fork-session` to branch off and try a different approach without affecting the original session.
+- **Parallel sessions** — use [git worktrees](https://git-scm.com/docs/git-worktree) to create separate directories for different branches, then run Claude in each one independently.
 
 ---
 

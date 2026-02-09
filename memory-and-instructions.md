@@ -82,21 +82,17 @@ Claude Code loads CLAUDE.md files from multiple locations. They are **all additi
 
 ---
 
-### 3. `.claude/CLAUDE.md` — Project Personal (Your Overrides)
+### 3. `CLAUDE.local.md` — Project Personal (Recommended for Personal Prefs)
 
 | Property | Detail |
 |---|---|
-| **Location** | `.claude/CLAUDE.md` in the project root |
+| **Location** | `CLAUDE.local.md` in the project root |
 | **Scope** | Applies to **this project only**, but only for **you** |
-| **Shared?** | No — personal to your machine |
-| **Git tracked?** | Typically no — add `.claude/` to `.gitignore` |
+| **Shared?** | No — **automatically added to .gitignore** |
+| **Git tracked?** | No (auto-gitignored) |
 | **Created by** | You, manually |
 
-**What to put here:**
-- Personal overrides for this specific project
-- Your local environment details (e.g., "my local DB is on port 5433")
-- Work-in-progress notes or reminders
-- Things that differ from the team setup
+This is the recommended way to add personal project-specific preferences. Because it's auto-gitignored, you don't need to worry about accidentally committing it.
 
 **Example:**
 ```markdown
@@ -105,9 +101,13 @@ Claude Code loads CLAUDE.md files from multiple locations. They are **all additi
 - Skip the E2E tests when running locally — they need Docker
 ```
 
+### 3b. `.claude/CLAUDE.md` — Project Personal (Alternative)
+
+Same purpose as `CLAUDE.local.md`, but lives in the `.claude/` directory. Either location works — `CLAUDE.local.md` is simpler since it's auto-gitignored.
+
 ---
 
-### 4. `.claude/rules/` — Always-Loaded Rule Files
+### 4. `.claude/rules/` — Modular Rule Files
 
 | Property | Detail |
 |---|---|
@@ -118,9 +118,9 @@ Claude Code loads CLAUDE.md files from multiple locations. They are **all additi
 | **Created by** | You or your team, manually |
 
 **How it works:**
-- Every file in this directory is loaded at startup
-- Files can be `.md` or plain text
+- All `.md` files are loaded at startup (recursively, including subdirectories)
 - Useful for splitting rules into logical groups rather than one big CLAUDE.md
+- Can be organized into subdirectories (e.g., `rules/frontend/`, `rules/backend/`)
 
 **Example structure:**
 ```
@@ -131,14 +131,45 @@ Claude Code loads CLAUDE.md files from multiple locations. They are **all additi
     security-guidelines.md
 ```
 
-**Example file (`.claude/rules/testing-rules.md`):**
+**Path-specific rules** — you can scope rules to specific files using YAML frontmatter:
+
 ```markdown
-## Testing Rules
-- Every new feature must have unit tests
-- Use xUnit for C# tests, Jest for TypeScript
-- Test file names must match: `{ClassName}Tests.cs` or `{module}.test.ts`
-- Mock external services — never hit real APIs in tests
+---
+paths:
+  - "src/api/**/*.ts"
+---
+# API Development Rules
+- All API endpoints must include input validation
+- Use the standard error response format
 ```
+
+Rules without a `paths` field apply to all files. Glob patterns like `**/*.ts`, `src/**/*`, and `src/**/*.{ts,tsx}` are supported.
+
+### 4b. `~/.claude/rules/` — User-Level Rules
+
+Personal rules that apply across all your projects. Same format as project rules, but stored in your home directory. User-level rules load before project rules (project rules take priority).
+
+---
+
+## CLAUDE.md Imports
+
+CLAUDE.md files can import other files using `@path/to/file` syntax:
+
+```markdown
+See @README.md for project overview and @package.json for available npm commands.
+
+# Additional Instructions
+- Git workflow: @docs/git-instructions.md
+- Personal overrides: @~/.claude/my-project-instructions.md
+```
+
+- Relative paths resolve relative to the file containing the import
+- Absolute and home-directory (`~/`) paths are supported
+- Imported files can recursively import others (max depth: 5)
+- Imports inside code blocks are ignored
+- First time Claude encounters imports in a project, it shows an approval dialog
+
+This is useful for keeping CLAUDE.md concise by referencing existing docs instead of duplicating them.
 
 ---
 
@@ -169,6 +200,10 @@ Claude is instructed to:
 - Note patterns that worked or failed
 - Update or remove outdated memories
 - Keep it organized by topic, not chronologically
+
+You can also tell Claude to save something specific: "remember that we use pnpm, not npm" or "save to memory that the API tests require a local Redis instance."
+
+Use `/memory` to open your memory files in your system editor for direct editing.
 
 ### Topic Files — Extended Memory
 
@@ -224,21 +259,28 @@ When a Claude Code session starts, the system prompt is assembled in this order:
 1. Core system prompt (identity, behavior rules, safety)
 2. Tool definitions (built-in + MCP)
 3. ── Memory & Instructions ──────────────────────
-   a. ~/.claude/CLAUDE.md              (global preferences)
-   b. CLAUDE.md (project root)         (team/project instructions)
-   c. .claude/CLAUDE.md                (personal project overrides)
-   d. .claude/rules/*                  (all rule files)
-   e. Auto memory (MEMORY.md)          (agent's learned notes)
-   f. Session memory                   (past session summaries)
-4. Custom agent definitions (.claude/agents/)
-5. Conversation history begins...
+   a. Managed policy CLAUDE.md          (organization-wide, if deployed)
+   b. ~/.claude/CLAUDE.md               (global preferences)
+   c. ~/.claude/rules/*                 (user-level rules)
+   d. CLAUDE.md (project root + parents)(team/project instructions)
+   e. CLAUDE.local.md                   (personal project prefs, auto-gitignored)
+   f. .claude/CLAUDE.md                 (personal project overrides)
+   g. .claude/rules/*                   (project rule files)
+   h. Auto memory (MEMORY.md)           (agent's learned notes)
+   i. Session memory                    (past session summaries)
+4. Skill descriptions (loaded as summaries — full content loads on demand)
+5. Custom subagent definitions (.claude/agents/)
+6. Conversation history begins...
 ```
+
+**CLAUDE.md files in child directories** (e.g., `src/api/CLAUDE.md`) are NOT loaded at startup — they load on demand when Claude reads files in those directories.
 
 ### Important behaviors:
 
-- **All files are additive.** Nothing overrides — they stack. If your global CLAUDE.md says "use tabs" and the project CLAUDE.md says "use spaces", Claude sees both instructions and the more specific/recent one typically wins in practice.
-- **All files consume context.** Every line in every CLAUDE.md file, rule file, and MEMORY.md eats into your 200K token budget. Keep them concise.
-- **Loading happens once at session start.** Changes to CLAUDE.md files mid-session are not picked up until the next session (or until compaction re-reads them).
+- **All files are additive.** Nothing overrides — they stack. More specific instructions generally take precedence in practice.
+- **All files consume context.** Every line eats into your context budget. Keep them concise.
+- **Parent directory loading** — Claude reads CLAUDE.md files recursively from your working directory up to (but not including) the root. Useful in monorepos where both `root/CLAUDE.md` and `root/packages/api/CLAUDE.md` apply.
+- **Use `/memory`** to see and edit all loaded memory files.
 
 ---
 
@@ -261,10 +303,13 @@ When a Claude Code session starts, the system prompt is assembled in this order:
 | File | Scope | Shared? | Git? | Loaded | Written by |
 |---|---|---|---|---|---|
 | `~/.claude/CLAUDE.md` | All projects | No | No | Always | You |
+| `~/.claude/rules/*` | All projects | No | No | Always | You |
 | `CLAUDE.md` (project root) | This project | Yes (team) | Yes | Always | You / team |
+| `CLAUDE.local.md` | This project | No (personal) | Auto-gitignored | Always | You |
 | `.claude/CLAUDE.md` | This project | No (personal) | No | Always | You |
 | `.claude/rules/*` | This project | Your choice | Your choice | Always | You / team |
-| `~/.claude/projects/<id>/memory/MEMORY.md` | This project | No | No | Always | Claude (agent) |
+| Child dir `CLAUDE.md` | Subdirectory | Your choice | Your choice | On demand | You / team |
+| `~/.claude/projects/<id>/memory/MEMORY.md` | This project | No | No | Always (first 200 lines) | Claude (agent) |
 | `~/.claude/projects/<id>/memory/*.md` | This project | No | No | On demand | Claude (agent) |
 | Session transcripts (JSONL) | This project | No | No | Summaries only | Automatic |
 
@@ -277,15 +322,19 @@ When a Claude Code session starts, the system prompt is assembled in this order:
 2. **Use the right file for the right scope:**
    - Personal habits → `~/.claude/CLAUDE.md`
    - Team standards → `CLAUDE.md` in project root
-   - Your local quirks → `.claude/CLAUDE.md`
+   - Your local quirks → `CLAUDE.local.md` (auto-gitignored)
    - Organized rules → `.claude/rules/`
 
 3. **Commit the project-root `CLAUDE.md` to git.** It's the most valuable file — it gives every team member's Claude the same project context.
 
-4. **Add `.claude/` to `.gitignore`** (or at minimum `.claude/CLAUDE.md`) to keep personal overrides out of version control.
+4. **Use `CLAUDE.local.md` for personal project prefs.** It's auto-gitignored, so no risk of committing it accidentally.
 
-5. **Don't duplicate information.** If the project README already explains the build process, reference it in CLAUDE.md rather than repeating it: "See README.md for build instructions."
+5. **Use `@` imports to keep CLAUDE.md lean.** Instead of pasting your API docs into CLAUDE.md, reference them: `See @docs/api.md for endpoint specifications.`
 
-6. **Review auto memory periodically.** Check `~/.claude/projects/<id>/memory/MEMORY.md` occasionally — Claude writes it, and it may accumulate stale or incorrect notes over time.
+6. **Move specialized instructions to skills.** If some instructions only matter for specific workflows (e.g., deployment checklists), put them in `.claude/skills/` instead of CLAUDE.md. Skills load on demand, CLAUDE.md loads every session.
 
-7. **Use `.claude/rules/` for long or structured rule sets.** If your CLAUDE.md is getting long, split rules into separate files in the rules directory.
+7. **Review auto memory periodically.** Use `/memory` to check MEMORY.md — Claude writes it, and it may accumulate stale or incorrect notes over time.
+
+8. **Use `.claude/rules/` for long or structured rule sets.** If your CLAUDE.md is getting long, split rules into separate files. Use path-specific rules (YAML `paths` frontmatter) to scope rules to relevant files.
+
+For the full memory configuration options, see the [official memory documentation](https://code.claude.com/docs/en/memory).
