@@ -1,5 +1,7 @@
 # Claude Code: Subagents (Task Tool) Deep Dive
 
+*Last verified against [official docs](https://code.claude.com/docs/en/) on 2026-02-09*
+
 How the Task tool works, its agent types, and when to use each one.
 
 ---

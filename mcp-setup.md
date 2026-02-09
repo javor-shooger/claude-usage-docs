@@ -1,5 +1,7 @@
 # Claude Code: MCP Server Configuration
 
+*Last verified against [official docs](https://code.claude.com/docs/en/) on 2026-02-09*
+
 How to add, configure, and manage MCP (Model Context Protocol) servers to extend Claude Code with additional tools.
 
 ---

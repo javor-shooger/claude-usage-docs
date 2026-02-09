@@ -1,5 +1,7 @@
 # Claude Code: Custom Subagents
 
+*Last verified against [official docs](https://code.claude.com/docs/en/) on 2026-02-09*
+
 How to create your own specialized subagents — reusable AI assistants with focused roles, restricted tools, and custom prompts.
 
 ---

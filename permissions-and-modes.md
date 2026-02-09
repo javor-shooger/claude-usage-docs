@@ -1,5 +1,7 @@
 # Claude Code: Permissions & Interaction Modes
 
+*Last verified against [official docs](https://code.claude.com/docs/en/) on 2026-02-09*
+
 How the permission system works, the different interaction modes, and when to use each one.
 
 ---

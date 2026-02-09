@@ -1,5 +1,7 @@
 # Claude Code: Writing Effective CLAUDE.md Files
 
+*Last verified against [official docs](https://code.claude.com/docs/en/) on 2026-02-09*
+
 How to write instructions that actually improve Claude's behavior — not just fill space.
 
 ---

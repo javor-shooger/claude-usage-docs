@@ -32,8 +32,14 @@ See `index.md` for the full list in recommended reading order. Key files:
 - Suggest a new file rather than appending to an existing one (unless it clearly belongs there)
 - Start by reviewing what's already documented to avoid duplication
 - Cross-reference related files where appropriate
-- **Check the official docs first.** Browse https://code.claude.com/docs/en/ to verify current behavior and discover details before writing. Our docs are a curated learning path, not a mirror — but they must be accurate.
+- **Check the official docs first.** Browse https://code.claude.com/docs/en/ to verify current behavior and discover details before writing. Use https://code.claude.com/docs/llms.txt as a machine-readable index of all official doc pages — fetch it to discover every available page. Our docs are a curated learning path, not a mirror — but they must be accurate.
 - **Add links to official docs.** When a topic has a full official page, link to it inline: "For details, see the [official X documentation](https://code.claude.com/docs/en/X)." This keeps our docs concise while giving readers a path to dig deeper.
+
+## Date Maintenance Rule
+Each doc file has a "Last verified against official docs on YYYY-MM-DD" line after the title. Update this date whenever you:
+- Verify the file's content against the official docs (even if no changes were needed)
+- Make substantive edits based on official doc changes
+Do NOT update the date for minor formatting fixes or typo corrections that don't involve checking official docs.
 
 ## Workflows Maintenance Rule
 When adding or updating a topic doc, check if `workflows-and-patterns.md` should be updated too:
@@ -53,3 +59,36 @@ When adding a new doc to `index.md`, place it in the correct position based on t
 6. **Being efficient** — context strategies, advanced features (Context Management, Subagents)
 7. **Extending** — MCP, plugins, integrations (MCP Setup)
 8. **Putting it all together** — workflows, patterns, recipes (Workflows & Patterns — always last)
+
+## How to Update These Docs
+
+When Claude Code features change or you suspect docs are outdated, follow this process:
+
+### Quick Update (single topic)
+1. Fetch the relevant official doc page from https://code.claude.com/docs/en/
+2. Read the corresponding project file
+3. Compare and fix any discrepancies
+4. Update the "Last verified" date in the edited file
+5. Check if other files reference the same information and keep them aligned
+
+### Full Audit (periodic)
+1. Fetch https://code.claude.com/docs/llms.txt to get the complete list of official doc pages
+2. Fetch every page listed there (use parallel subagents for speed)
+3. Read all 15 project files
+4. Cross-reference for: factual errors, outdated information, missing features, cross-file inconsistencies
+5. Output a markdown table audit report grouping issues by file
+6. Plan and implement fixes file-by-file in index order
+7. Run a cross-file consistency check after all edits
+8. Update the "Last verified" date on every file that was checked
+
+### What to Check For
+- **Factual errors** — our docs say X, official docs say Y
+- **Outdated information** — features that have changed, new options added
+- **Missing beginner features** — things a user would discover in their first two weeks
+- **Cross-file inconsistencies** — same concept described differently in multiple files
+- **Broken links** — official doc URLs that have moved or changed
+
+### What NOT to Flag
+- Differences in depth (our docs are deliberately more concise)
+- Features we intentionally omit (too advanced or niche for our audience)
+- Wording differences that don't affect accuracy

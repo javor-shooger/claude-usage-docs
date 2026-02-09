@@ -1,5 +1,7 @@
 # Claude Code: Workflows & Patterns
 
+*Last verified against [official docs](https://code.claude.com/docs/en/) on 2026-02-09*
+
 Common effective patterns for real tasks — recipes you can follow and adapt.
 
 ---

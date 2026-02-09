@@ -25,3 +25,7 @@ Start here and work through in order — each file builds on concepts from the p
 | 13  | [Extending Claude Code](extending-claude-code.md)                   | Skills, hooks, and plugins — on-demand knowledge, guaranteed automation, extension packs          |
 | 14  | [Custom Subagents](custom-agents.md)                                | Create your own subagents in `.claude/agents/` — YAML frontmatter, tools, model overrides        |
 | 15  | [Workflows & Patterns](workflows-and-patterns.md)                   | Putting it all together — recipes for plan→implement, explore→fix, debugging, rewind & retry      |
+
+---
+
+> All files include a "Last verified" date showing when the content was last checked against the [official Claude Code documentation](https://code.claude.com/docs/en/).

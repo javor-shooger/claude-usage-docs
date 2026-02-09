@@ -1,5 +1,7 @@
 # Claude Code: Prompt Crafting
 
+*Last verified against [official docs](https://code.claude.com/docs/en/) on 2026-02-09*
+
 How to write effective prompts that get the right result on the first try.
 
 ---

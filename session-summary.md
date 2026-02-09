@@ -1,5 +1,7 @@
 # Claude Code Agent: Session & Context Mechanics
 
+*Last verified against [official docs](https://code.claude.com/docs/en/) on 2026-02-09*
+
 ## What Makes Up a Session's Context Window
 
 Claude Code operates within a context window (200K tokens by default, or 1M with the `[1m]` model suffix — e.g., `sonnet[1m]`). Each API call assembles and sends the following layers:

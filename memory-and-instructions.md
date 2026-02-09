@@ -1,5 +1,7 @@
 # Claude Code: Memory & Instruction Files
 
+*Last verified against [official docs](https://code.claude.com/docs/en/) on 2026-02-09*
+
 A detailed reference for all the files that give Claude Code persistent instructions and memory across sessions.
 
 ---

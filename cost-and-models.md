@@ -1,5 +1,7 @@
 # Claude Code: Cost Awareness & Model Selection
 
+*Last verified against [official docs](https://code.claude.com/docs/en/) on 2026-02-09*
+
 Understanding token costs, choosing the right model, and keeping spending efficient.
 
 ---

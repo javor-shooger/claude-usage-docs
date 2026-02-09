@@ -1,5 +1,7 @@
 # Claude Code: Context Management Strategies
 
+*Last verified against [official docs](https://code.claude.com/docs/en/) on 2026-02-09*
+
 Practical strategies for managing your context budget effectively — the difference between knowing how the engine works and knowing how to drive.
 
 ---

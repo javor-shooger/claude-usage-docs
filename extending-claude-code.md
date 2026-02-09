@@ -1,5 +1,7 @@
 # Claude Code: Extending Claude Code
 
+*Last verified against [official docs](https://code.claude.com/docs/en/) on 2026-02-09*
+
 A beginner-friendly overview of the three main ways to extend Claude Code beyond its built-in capabilities: Skills, Hooks, and Plugins.
 
 ---

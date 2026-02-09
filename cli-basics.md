@@ -1,5 +1,7 @@
 # Claude Code: Getting Started & Daily Controls
 
+*Last verified against [official docs](https://code.claude.com/docs/en/) on 2026-02-09*
+
 The everyday commands, shortcuts, and controls — covering both the CLI and the VS Code extension.
 
 ---

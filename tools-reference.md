@@ -1,5 +1,7 @@
 # Claude Code Tools Reference
 
+*Last verified against [official docs](https://code.claude.com/docs/en/) on 2026-02-09*
+
 A complete reference of all 39 tools available in Claude Code.
 
 ---

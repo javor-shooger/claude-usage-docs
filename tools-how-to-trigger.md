@@ -1,5 +1,7 @@
 # How to Trigger Claude Code Tools
 
+*Last verified against [official docs](https://code.claude.com/docs/en/) on 2026-02-09*
+
 A practical guide on what to say to make Claude use specific tools — both implicitly (natural language) and explicitly (direct references).
 
 ---
