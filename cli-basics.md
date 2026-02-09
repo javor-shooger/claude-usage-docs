@@ -8,44 +8,44 @@ The everyday commands, shortcuts, and controls — covering both the CLI and the
 
 Slash commands are typed directly into the input prompt. They are **built-in CLI commands**, not tool calls — they execute instantly on the client side.
 
-| Command | What It Does |
-|---|---|
-| `/help` | Show help and available commands |
-| `/compact` | Manually compress conversation to free context. Optionally add a focus: `/compact focus on the auth work` |
-| `/clear` | Clear the conversation history and start fresh (same session) |
-| `/init` | Create a `CLAUDE.md` file in the current project root (analyzes your project to generate a starter) |
-| `/cost` | Show token usage and cost for the current session |
-| `/stats` | Visualize daily usage, session history, streaks, and model preferences |
-| `/usage` | Show plan usage limits and rate limit status (subscription users — Pro, Max, Teams) |
-| `/context` | Show what's consuming context space (tools, MCP servers, conversation) |
-| `/model` | Switch the model mid-session. Also configure effort level for extended thinking. |
-| `/memory` | Open your memory files (CLAUDE.md + auto memory) in your system editor |
-| `/agents` | View, create, edit, and manage custom subagents |
-| `/resume` | Switch to a different conversation (opens session picker) |
-| `/rename` | Give the current session a memorable name (e.g., `/rename auth-refactor`) |
-| `/rewind` | Open the rewind menu to restore conversation and/or code to a previous checkpoint |
-| `/config` | Toggle global settings (e.g., thinking mode on/off) |
-| `/permissions` | View and manage tool permission rules |
-| `/mcp` | Check configured MCP servers and their per-server context costs |
-| `/statusline` | Configure the status bar shown at the bottom of the terminal |
-| `/hooks` | Interactive hook configuration |
-| `/plugin` | Browse and install plugins from the marketplace |
-| `/sandbox` | Enable OS-level sandboxing for Bash commands |
-| `/fast` | Toggle fast mode (same model, faster output) |
-| `/plan` | Enter plan mode directly (Claude analyzes without modifying files) |
-| `/login` | Log in or switch accounts |
-| `/logout` | Sign out of your current account |
-| `/theme` | Change the color theme and toggle syntax highlighting |
-| `/vim` | Enable vim-style keybindings for the input editor |
-| `/keybindings` | Customize keyboard shortcuts (opens `~/.claude/keybindings.json`) |
-| `/output-style` | Change Claude's response style (Default, Explanatory, Learning, or custom) |
-| `/tasks` | List and manage background tasks |
-| `/quit` or `/exit` | End the session |
-| `/status` | Show version, model, account, and connectivity info |
-| `/debug` | Troubleshoot the current session (reads debug log) |
-| `/doctor` | Check health of your Claude Code installation |
-| `/export` | Export conversation to a file or clipboard |
-| `/copy` | Copy the last assistant response to clipboard |
+| Command            | What It Does                                                                                              |
+| ------------------ | --------------------------------------------------------------------------------------------------------- |
+| `/help`            | Show help and available commands                                                                          |
+| `/compact`         | Manually compress conversation to free context. Optionally add a focus: `/compact focus on the auth work` |
+| `/clear`           | Clear the conversation history and start fresh (same session)                                             |
+| `/init`            | Create a `CLAUDE.md` file in the current project root (analyzes your project to generate a starter)       |
+| `/cost`            | Show token usage and cost for the current session                                                         |
+| `/stats`           | Visualize daily usage, session history, streaks, and model preferences                                    |
+| `/usage`           | Show plan usage limits and rate limit status (subscription users — Pro, Max, Teams)                       |
+| `/context`         | Show what's consuming context space (tools, MCP servers, conversation)                                    |
+| `/model`           | Switch the model mid-session. Also configure effort level for extended thinking.                          |
+| `/memory`          | Open your memory files (CLAUDE.md + auto memory) in your system editor                                    |
+| `/agents`          | View, create, edit, and manage custom subagents                                                           |
+| `/resume`          | Switch to a different conversation (opens session picker)                                                 |
+| `/rename`          | Give the current session a memorable name (e.g., `/rename auth-refactor`)                                 |
+| `/rewind`          | Open the rewind menu to restore conversation and/or code to a previous checkpoint                         |
+| `/config`          | Toggle global settings (e.g., thinking mode on/off)                                                       |
+| `/permissions`     | View and manage tool permission rules                                                                     |
+| `/mcp`             | Check configured MCP servers and their per-server context costs                                           |
+| `/statusline`      | Configure the status bar shown at the bottom of the terminal                                              |
+| `/hooks`           | Interactive hook configuration                                                                            |
+| `/plugin`          | Browse and install plugins from the marketplace                                                           |
+| `/sandbox`         | Enable OS-level sandboxing for Bash commands                                                              |
+| `/fast`            | Toggle fast mode (same model, faster output)                                                              |
+| `/plan`            | Enter plan mode directly (Claude analyzes without modifying files)                                        |
+| `/login`           | Log in or switch accounts                                                                                 |
+| `/logout`          | Sign out of your current account                                                                          |
+| `/theme`           | Change the color theme and toggle syntax highlighting                                                     |
+| `/vim`             | Enable vim-style keybindings for the input editor                                                         |
+| `/keybindings`     | Customize keyboard shortcuts (opens `~/.claude/keybindings.json`)                                         |
+| `/output-style`    | Change Claude's response style (Default, Explanatory, Learning, or custom)                                |
+| `/tasks`           | List and manage background tasks                                                                          |
+| `/quit` or `/exit` | End the session                                                                                           |
+| `/status`          | Show version, model, account, and connectivity info                                                       |
+| `/debug`           | Troubleshoot the current session (reads debug log)                                                        |
+| `/doctor`          | Check health of your Claude Code installation                                                             |
+| `/export`          | Export conversation to a file or clipboard                                                                |
+| `/copy`            | Copy the last assistant response to clipboard                                                             |
 
 ### Slash Commands vs Skills
 
