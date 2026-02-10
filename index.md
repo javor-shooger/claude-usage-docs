@@ -23,8 +23,9 @@ Start here and work through in order — each file builds on concepts from the p
 | 11  | [Subagents Deep Dive](subagents.md)                                 | How the Task tool works — agent types, parallelism, background execution, custom subagents        |
 | 12  | [MCP Server Configuration](mcp-setup.md)                            | Adding MCP servers, tool search, MCP resources, context cost management                           |
 | 13  | [Extending Claude Code](extending-claude-code.md)                   | Skills, hooks, and plugins — on-demand knowledge, guaranteed automation, extension packs          |
-| 14  | [Custom Subagents](custom-agents.md)                                | Create your own subagents in `.claude/agents/` — YAML frontmatter, tools, model overrides        |
-| 15  | [Workflows & Patterns](workflows-and-patterns.md)                   | Putting it all together — recipes for plan→implement, explore→fix, debugging, rewind & retry      |
+| 14  | [Skills Deep Dive](skills.md)                                       | Creating skills, scopes (project/personal/enterprise), arguments, subagent integration, troubleshooting |
+| 15  | [Custom Subagents](custom-agents.md)                                | Create your own subagents in `.claude/agents/` — YAML frontmatter, tools, model overrides        |
+| 16  | [Workflows & Patterns](workflows-and-patterns.md)                   | Putting it all together — recipes for plan→implement, explore→fix, debugging, rewind & retry      |
 
 ---
 

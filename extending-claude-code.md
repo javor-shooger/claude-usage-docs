@@ -1,6 +1,6 @@
 # Claude Code: Extending Claude Code
 
-*Last verified against [official docs](https://code.claude.com/docs/en/) on 2026-02-09*
+*Last verified against [official docs](https://code.claude.com/docs/en/) on 2026-02-10*
 
 A beginner-friendly overview of the three main ways to extend Claude Code beyond its built-in capabilities: Skills, Hooks, and Plugins.
 
@@ -20,88 +20,41 @@ Out of the box, Claude Code has powerful built-in tools (Read, Edit, Bash, etc.)
 
 ## Skills
 
-Skills are markdown files that give Claude **domain knowledge** or **reusable workflows**. Unlike CLAUDE.md (which loads every session), skills load **on demand** — only when Claude determines they're relevant or when you invoke them directly with a slash command.
+Skills are markdown files that give Claude **domain knowledge** or **reusable workflows**. Unlike CLAUDE.md (which loads every session), skills load **on demand** — only when Claude determines they're relevant or when you invoke them with a slash command.
 
-Skills follow the [Agent Skills open standard](https://agentskills.io), extended with Claude Code-specific features.
+| Aspect | How it works |
+|---|---|
+| **Where they live** | `.claude/skills/<name>/SKILL.md` (project) or `~/.claude/skills/<name>/SKILL.md` (personal) |
+| **Format** | YAML frontmatter + markdown content. Only `description` is recommended. |
+| **Two types** | *Reference* skills add knowledge (API conventions, style guides). *Task* skills define workflows (`/deploy`, `/fix-issue`). |
+| **Auto vs manual** | By default, Claude loads skills when relevant. Add `disable-model-invocation: true` for manual-only (`/skill-name`). |
+| **Arguments** | Use `$ARGUMENTS` (or `$0`, `$1`) in content. `/fix-issue 1234` passes `1234`. |
+| **Isolation** | Add `context: fork` to run in a subagent with its own context window. |
+| **Context cost** | Descriptions load at startup (small). Full content loads only when invoked. |
 
-### Where They Live
-
-```
-.claude/skills/          ← project-level (commit to git for team use)
-├── api-conventions/
-│   └── SKILL.md
-├── fix-issue/
-│   └── SKILL.md
-└── deploy-checklist/
-    └── SKILL.md
-
-~/.claude/skills/        ← personal-level (available across all your projects)
-└── my-workflow/
-    └── SKILL.md
-```
-
-### SKILL.md Format
-
+**Quick example — a reference skill:**
 ```markdown
 ---
-name: api-conventions
 description: REST API design conventions for our services
 ---
-# API Conventions
 - Use kebab-case for URL paths
 - Use camelCase for JSON properties
 - Always include pagination for list endpoints
-- Version APIs in the URL path (/v1/, /v2/)
 ```
 
-The `description` field tells Claude when this skill is relevant. When Claude works on API code and sees this description, it loads the skill automatically.
-
-### Slash-Command Skills
-
-Skills can also be invoked manually as slash commands — useful for workflows with side effects:
-
+**Quick example — a task skill:**
 ```markdown
 ---
 name: fix-issue
 description: Fix a GitHub issue
 disable-model-invocation: true
 ---
-Analyze and fix the GitHub issue: $ARGUMENTS.
-
-1. Use `gh issue view` to get the issue details
-2. Search the codebase for relevant files
-3. Implement the fix
-4. Write and run tests
-5. Create a commit and push a PR
+Fix GitHub issue $ARGUMENTS. Search the codebase, implement the fix, write tests, commit.
 ```
 
-Usage: `/fix-issue 1234` — the `1234` becomes `$ARGUMENTS` in the skill template.
+For the full guide — creation walkthrough, all frontmatter fields, arguments, dynamic context injection, subagent integration, permissions, and troubleshooting — see **[Skills Deep Dive](skills.md)**.
 
-The `disable-model-invocation: true` flag means Claude won't auto-invoke this skill — you have to trigger it manually. This is good for workflows that make changes.
-
-### Skill Frontmatter Fields
-
-| Field | Description |
-|---|---|
-| `name` | Display name (lowercase, hyphens, max 64 chars) |
-| `description` | What the skill does and when to use it |
-| `argument-hint` | Hint for expected arguments (e.g., "issue number") |
-| `disable-model-invocation` | Prevent Claude from auto-loading (default: `false`) |
-| `user-invocable` | Show in `/` slash command menu (default: `true`) |
-| `allowed-tools` | Tools Claude can use without permission when skill is active |
-| `model` | Model to use when skill is active |
-| `context` | Set to `fork` to run the skill in a subagent (isolated context) |
-| `agent` | Which subagent type when `context: fork` is set |
-| `hooks` | Hooks scoped to the skill's lifecycle (cleaned up when done) |
-
-### Key Points
-
-- Skills load on demand, not at session start — they **don't bloat your base context**
-- Claude sees skill descriptions at startup but only loads the full content when needed
-- Use skills for domain knowledge that's only relevant sometimes
-- Use CLAUDE.md for rules that apply every session
-
-For the full skill configuration options, see the [official skills documentation](https://code.claude.com/docs/en/skills).
+For the official specification, see the [official skills documentation](https://code.claude.com/docs/en/skills).
 
 ---
 
@@ -216,8 +169,8 @@ For details on creating your own plugins, see the [official plugins documentatio
 
 | I want to... | Use |
 |---|---|
-| Give Claude project knowledge that loads only when relevant | **Skill** |
-| Create a reusable workflow I invoke with `/command` | **Skill** (with `disable-model-invocation: true`) |
+| Give Claude project knowledge that loads only when relevant | **Skill** — see [Skills Deep Dive](skills.md) |
+| Create a reusable workflow I invoke with `/command` | **Skill** (with `disable-model-invocation: true`) — see [Skills Deep Dive](skills.md) |
 | Guarantee a script runs after every file edit | **Hook** |
 | Block Claude from writing to certain files | **Hook** (PreToolUse with exit code 2) |
 | Install a pre-made extension pack | **Plugin** |

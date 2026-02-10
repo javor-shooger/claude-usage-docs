@@ -35,7 +35,7 @@ For reference, Claude's context window is **200,000 tokens**, so the tool defini
 - **MCP tools are present if the MCP server is configured** — they load at session start, not on first invocation. If you have Playwright MCP configured, those 22 tool definitions are in every session's context whether you use them or not.
 - **MCP tool search** — when MCP tools exceed ~10% of context, Claude Code automatically defers them (lists tools on demand instead of loading all at startup). Use `/mcp` to check per-server costs.
 - **To reduce context cost from MCP tools**, you would need to remove the MCP server configuration from your Claude Code settings for sessions where you don't need browser automation.
-- **Skills and plugins can add more tools** — custom skills (`.claude/skills/`) and installed plugins may provide additional capabilities beyond the built-in and MCP tools listed here. See [Extending Claude Code](extending-claude-code.md).
+- **Skills and plugins can add more tools** — custom skills (`.claude/skills/`) and installed plugins may provide additional capabilities beyond the built-in and MCP tools listed here. See [Skills Deep Dive](skills.md) and [Extending Claude Code](extending-claude-code.md).
 - **The system prompt itself** (instructions, CLAUDE.md content, git status, etc.) also consumes significant context — often more than the tool definitions themselves.
 - **Output styles** (`/output-style`) change how Claude formats responses — Default, Explanatory, or Learning modes — but are not tools. They modify the system prompt, not the tool set.
 

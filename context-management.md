@@ -161,7 +161,7 @@ Skills (`.claude/skills/`) only load their full content **when Claude determines
 
 **Zero-cost skills:** Add `disable-model-invocation: true` to a skill's frontmatter to prevent Claude from auto-loading it. The skill is only invoked when you call it explicitly with a slash command — zero context cost until then.
 
-See [Extending Claude Code](extending-claude-code.md) for how to create skills.
+See [Skills Deep Dive](skills.md) for how to create skills.
 
 ---
 

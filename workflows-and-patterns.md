@@ -193,7 +193,7 @@ Step 2: Commit + PR
   → Returns the PR URL
 ```
 
-**Shortcut:** If you have a `/commit-push-pr` skill set up, it can handle commit + push + PR creation in one step.
+**Shortcut:** If you have a `/commit-push-pr` skill set up, it can handle commit + push + PR creation in one step. See [Skills Deep Dive](skills.md) to create your own workflow skills.
 
 ### PR Review
 ```

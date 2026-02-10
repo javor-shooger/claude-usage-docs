@@ -129,7 +129,7 @@ This alone saves Claude from having to explore your package.json, tsconfig, and 
 | Obvious things | "Use git for version control" — Claude already knows. |
 | Duplicated info | If it's in your README, reference it: "See README.md for setup instructions." |
 | Comments about the CLAUDE.md itself | "This file tells Claude how to work" — wastes tokens. |
-| Specialized workflow instructions | Move these to skills (`.claude/skills/`) — they load on demand instead of every session. See [Extending Claude Code](extending-claude-code.md). |
+| Specialized workflow instructions | Move these to skills (`.claude/skills/`) — they load on demand instead of every session. See [Skills Deep Dive](skills.md). |
 
 ---
 

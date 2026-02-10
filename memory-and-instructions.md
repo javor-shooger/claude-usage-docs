@@ -344,7 +344,7 @@ When a Claude Code session starts, the system prompt is assembled in this order:
 
 5. **Use `@` imports to keep CLAUDE.md lean.** Instead of pasting your API docs into CLAUDE.md, reference them: `See @docs/api.md for endpoint specifications.`
 
-6. **Move specialized instructions to skills.** If some instructions only matter for specific workflows (e.g., deployment checklists), put them in `.claude/skills/` instead of CLAUDE.md. Skills load on demand, CLAUDE.md loads every session.
+6. **Move specialized instructions to skills.** If some instructions only matter for specific workflows (e.g., deployment checklists), put them in `.claude/skills/` instead of CLAUDE.md. Skills load on demand, CLAUDE.md loads every session. See [Skills Deep Dive](skills.md).
 
 7. **Review auto memory periodically.** Use `/memory` to check MEMORY.md — Claude writes it, and it may accumulate stale or incorrect notes over time.
 

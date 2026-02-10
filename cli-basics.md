@@ -85,7 +85,7 @@ Additional skills may be available depending on your setup — they appear in sy
 
 ### Custom Skills
 
-You can create your own skills by adding `SKILL.md` files in `.claude/skills/`. Each skill is a directory with a `SKILL.md` file containing YAML frontmatter and instructions. Skills load on demand (not at session start), keeping your base context lean. See [Extending Claude Code](extending-claude-code.md) for details.
+You can create your own skills by adding `SKILL.md` files in `.claude/skills/`. Each skill is a directory with a `SKILL.md` file containing YAML frontmatter and instructions. Skills load on demand (not at session start), keeping your base context lean. See [Skills Deep Dive](skills.md) for a full creation guide.
 
 ---
 

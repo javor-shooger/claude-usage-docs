@@ -163,7 +163,7 @@ Say: **"plan this before coding"** or **"enter plan mode"**
 Use slash commands: **"/commit"**, **"/review"**, etc.
 - These invoke registered skills via the Skill tool
 - Custom skills in `.claude/skills/` are also invocable as slash commands (e.g., `/fix-issue 1234`)
-- See [Extending Claude Code](extending-claude-code.md) for details on creating custom skills
+- See [Skills Deep Dive](skills.md) for details on creating custom skills
 
 ### 9. Manage Custom Subagents
 Use **/agents** to create and manage custom subagents from the CLI.
