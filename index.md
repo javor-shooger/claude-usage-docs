@@ -25,7 +25,8 @@ Start here and work through in order — each file builds on concepts from the p
 | 13  | [Extending Claude Code](extending-claude-code.md)                   | Skills, hooks, and plugins — on-demand knowledge, guaranteed automation, extension packs          |
 | 14  | [Skills Deep Dive](skills.md)                                       | Creating skills, scopes (project/personal/enterprise), arguments, subagent integration, troubleshooting |
 | 15  | [Custom Subagents](custom-agents.md)                                | Create your own subagents in `.claude/agents/` — YAML frontmatter, tools, model overrides        |
-| 16  | [Workflows & Patterns](workflows-and-patterns.md)                   | Putting it all together — recipes for plan→implement, explore→fix, debugging, rewind & retry      |
+| 16  | [Plugins Deep Dive](plugins.md)                                     | Installing and using plugins — official collection, code intelligence, scopes, managing plugins   |
+| 17  | [Workflows & Patterns](workflows-and-patterns.md)                   | Putting it all together — recipes for plan→implement, explore→fix, debugging, rewind & retry      |
 
 ---
 

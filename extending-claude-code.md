@@ -161,6 +161,8 @@ Plugins can come from:
 - **Code intelligence plugins** are especially useful — they give Claude precise "go to definition" and "find references" navigation for typed languages. See the [plugin marketplace](https://code.claude.com/docs/en/discover-plugins) for available language plugins.
 - You don't need to create plugins to use them — just browse and install
 
+For the full guide — the official plugin collection (42 plugins), code intelligence setup, installation scopes, managing plugins, and marketplace configuration — see **[Plugins Deep Dive](plugins.md)**.
+
 For details on creating your own plugins, see the [official plugins documentation](https://code.claude.com/docs/en/plugins).
 
 ---
@@ -173,8 +175,8 @@ For details on creating your own plugins, see the [official plugins documentatio
 | Create a reusable workflow I invoke with `/command` | **Skill** (with `disable-model-invocation: true`) — see [Skills Deep Dive](skills.md) |
 | Guarantee a script runs after every file edit | **Hook** |
 | Block Claude from writing to certain files | **Hook** (PreToolUse with exit code 2) |
-| Install a pre-made extension pack | **Plugin** |
-| Give Claude "go to definition" navigation | **Plugin** (code intelligence) |
+| Install a pre-made extension pack | **Plugin** — see [Plugins Deep Dive](plugins.md) |
+| Give Claude "go to definition" navigation | **Plugin** (code intelligence) — see [Plugins Deep Dive](plugins.md) |
 | Add rules that apply every session | **CLAUDE.md** (not an extension — just use your instruction file) |
 | Connect to an external service (Figma, DB, etc.) | **MCP server** (see [MCP Setup](mcp-setup.md)) |
 
@@ -186,5 +188,5 @@ For details on creating your own plugins, see the [official plugins documentatio
 |---|---|---|---|
 | **Skills** | `.claude/skills/*/SKILL.md` or `~/.claude/skills/*/SKILL.md` | On demand (when relevant or invoked) | You |
 | **Hooks** | Settings JSON or managed settings | Automatically at configured trigger points (14 events) | You |
-| **Plugins** | Installed via `/plugin` | At session start | Community / you |
+| **Plugins** | Installed via `/plugin` (see [Plugins Deep Dive](plugins.md)) | At session start | Community / you |
 | **MCP servers** | `~/.claude.json` or `.mcp.json` (`mcpServers` key) | At session start | External packages |

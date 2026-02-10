@@ -405,7 +405,7 @@ If a skill and a command share the same name, the skill takes precedence.
 | Method | How |
 |---|---|
 | **Team (project-level)** | Commit `.claude/skills/` to version control |
-| **Plugins** | Include a `skills/` directory in your plugin |
+| **Plugins** | Include a `skills/` directory in your plugin (see [Plugins Deep Dive](plugins.md)) |
 | **Organization-wide** | Deploy through managed settings |
 
 ---

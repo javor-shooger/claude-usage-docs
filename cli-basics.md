@@ -31,7 +31,7 @@ Slash commands are typed directly into the input prompt. They are **built-in CLI
 | `/mcp`             | Check configured MCP servers and their per-server context costs                                           |
 | `/statusline`      | Configure the status bar shown at the bottom of the terminal                                              |
 | `/hooks`           | Interactive hook configuration                                                                            |
-| `/plugin`          | Browse and install plugins from the marketplace                                                           |
+| `/plugin`          | Browse and install plugins from the marketplace (see [Plugins Deep Dive](plugins.md))                     |
 | `/sandbox`         | Enable OS-level sandboxing for Bash commands                                                              |
 | `/fast`            | Toggle fast mode (same model, faster output)                                                              |
 | `/plan`            | Enter plan mode directly (Claude analyzes without modifying files)                                        |
@@ -408,7 +408,7 @@ Claude sees your selection and knows exactly what "this" refers to. This works f
 | Switch to a cheaper model | `/model` |
 | Include a file in your message | `@path/to/file` |
 | Manage subagents | `/agents` |
-| Browse plugins | `/plugin` |
+| Browse plugins | `/plugin` (see [Plugins Deep Dive](plugins.md)) |
 | End the session | `/quit` |
 | Ask about highlighted code | Select code in editor, then ask (VS Code) |
 | Jump to a file Claude mentions | Click the file link in the response (VS Code) |

@@ -73,6 +73,8 @@ Step 5: Verify
 
 **Why it works:** Understanding the bug before fixing it leads to correct fixes, not band-aids.
 
+**Tip:** Install a code intelligence plugin for your language (`/plugin`) to give Claude IDE-quality "go to definition" and "find references" navigation. This makes the investigation phase faster and more precise than text search alone. See [Plugins Deep Dive](plugins.md).
+
 ---
 
 ## Workflow 3: Targeted Edit
