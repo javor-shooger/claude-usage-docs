@@ -13,7 +13,7 @@ For the official overview, see the [features overview](https://code.claude.com/d
 | Mechanism            | What It Does                                          | One-Liner                                              | Deep Dive                                                    |
 | -------------------- | ----------------------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------ |
 | **Skills**           | Give Claude reusable knowledge and workflows          | "A prompt template Claude can load on demand"          | [Skills Deep Dive](skills.md)                                |
-| **Hooks**            | Run scripts automatically at specific points          | "If X happens, always do Y — guaranteed"               | [Official hooks docs](https://code.claude.com/docs/en/hooks) |
+| **Hooks**            | Run scripts automatically at specific points          | "If X happens, always do Y — guaranteed"               | [Hooks Deep Dive](hooks.md)                                  |
 | **Custom Subagents** | Delegate tasks to specialized workers                 | "A focused assistant with its own context window"      | [Custom Subagents](custom-agents.md)                         |
 | **MCP Servers**      | Connect Claude to external tools and services         | "An open-protocol bridge to databases, APIs, browsers" | [MCP Setup](mcp-setup.md)                                    |
 | **Plugins**          | Bundle skills + hooks + agents + MCP into one package | "An installable extension pack"                        | [Plugins Deep Dive](plugins.md)                              |
@@ -62,7 +62,7 @@ Hooks are **scripts that run automatically** at specific points in Claude's work
 }
 ```
 
-For hook events, configuration, and advanced patterns, see the [official hooks documentation](https://code.claude.com/docs/en/hooks).
+For the full guide — events, hook types, matchers, input/output, practical examples — see **[Hooks Deep Dive](hooks.md)** and the [official hooks documentation](https://code.claude.com/docs/en/hooks).
 
 ---
 
@@ -207,7 +207,7 @@ Hook, not a skill. Skills are advisory — Claude can choose to ignore them. Hoo
 | Extension | Where defined | Loads when | Created by | Deep Dive |
 |---|---|---|---|---|
 | **Skills** | `.claude/skills/*/SKILL.md` | On demand (relevant or invoked) | You | [Skills Deep Dive](skills.md) |
-| **Hooks** | Settings JSON or skill/agent frontmatter | At trigger events (14 events) | You | [Official docs](https://code.claude.com/docs/en/hooks) |
+| **Hooks** | Settings JSON or skill/agent frontmatter | At trigger events (14 events) | You | [Hooks Deep Dive](hooks.md) |
 | **Custom Subagents** | `.claude/agents/*.md` | On demand (delegated) | You | [Custom Subagents](custom-agents.md) |
 | **MCP Servers** | `~/.claude.json` or `.mcp.json` | At session start | External packages / you | [MCP Setup](mcp-setup.md) |
 | **Plugins** | Installed via `/plugin` | At session start | Community / Anthropic / you | [Plugins Deep Dive](plugins.md) |

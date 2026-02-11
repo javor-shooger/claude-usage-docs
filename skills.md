@@ -333,7 +333,7 @@ The full content of each listed skill is injected into the subagent's context at
 
 ## Hooks Inside Skills
 
-Skills can define hooks in their frontmatter. These are scoped to the skill's lifecycle and cleaned up when it finishes:
+Skills can define hooks in their frontmatter. These are scoped to the skill's lifecycle and cleaned up when it finishes. For the full hooks reference, see [Hooks Deep Dive](hooks.md).
 
 ```yaml
 ---

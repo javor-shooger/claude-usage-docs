@@ -85,7 +85,7 @@ The YAML frontmatter configures the subagent. The markdown body becomes its syst
 | `maxTurns` | No | Maximum agentic turns before stopping |
 | `skills` | No | Skills to preload into agent context at startup |
 | `mcpServers` | No | MCP servers available to this agent |
-| `hooks` | No | Lifecycle hooks scoped to this agent |
+| `hooks` | No | Lifecycle hooks scoped to this agent — see [Hooks Deep Dive](hooks.md) |
 | `memory` | No | Persistent memory scope: `user`, `project`, or `local` |
 
 The `delegate` permission mode is for agent team leads — it restricts the agent to coordination-only, using team management tools rather than direct code tools.

@@ -10,7 +10,7 @@ A personal reference library documenting how Claude Code works — its tools, me
 - **Don't overwrite existing files without reading them first.** The user has built these across multiple sessions — always read before editing.
 - **Use the same style as existing files:** markdown tables, concise bullet points, practical examples, clear section headers.
 
-## Existing Files (17 files)
+## Existing Files (18 files)
 See `index.md` for the full list in recommended reading order. Key files:
 - `cli-basics.md` — Slash commands, keyboard shortcuts, `@` references, platforms
 - `session-summary.md` — Sessions, context window, checkpointing, compaction
@@ -25,6 +25,7 @@ See `index.md` for the full list in recommended reading order. Key files:
 - `subagents.md` — Task tool deep dive, agent types, custom subagents
 - `mcp-setup.md` — MCP server configuration, tool search, resources
 - `extending-claude-code.md` — Extension mechanisms compared — skills, hooks, subagents, MCP, plugins — decision guide
+- `hooks.md` — Hooks deep dive: 14 events, 3 hook types, matchers, input/output, practical examples
 - `skills.md` — Skills deep dive: creation, scopes, arguments, subagent integration
 - `custom-agents.md` — Custom subagents in `.claude/agents/`
 - `plugins.md` — Plugins deep dive: official collection, code intelligence, installation, management
@@ -44,7 +45,7 @@ Each doc file has a "Last verified against official docs on YYYY-MM-DD" line aft
 Do NOT update the date for minor formatting fixes or typo corrections that don't involve checking official docs.
 
 ## Extending Claude Code Maintenance Rule
-`extending-claude-code.md` is a **comparison and decision guide** — not a deep dive. It synthesizes information from 5 deep-dive files (skills.md, custom-agents.md, mcp-setup.md, plugins.md, and the official hooks docs) plus community sources. Maintain it differently:
+`extending-claude-code.md` is a **comparison and decision guide** — not a deep dive. It synthesizes information from 6 deep-dive files (hooks.md, skills.md, custom-agents.md, mcp-setup.md, plugins.md, and subagents.md) plus community sources. Maintain it differently:
 - **When updating any deep-dive file**, check if the comparison matrix, decision table, or brief summaries in `extending-claude-code.md` need to match. The facts must stay consistent.
 - **When a new extension mechanism is added** (or an existing one changes significantly), update all three sections: the brief summary, the comparison matrix row, and the decision table rows.
 - **Community-sourced claims** (activation rates, context window shrinkage, subagent size recommendations) are marked implicitly by phrases like "community testing shows." These may become outdated — re-verify against current sources during audits.
@@ -83,7 +84,7 @@ When Claude Code features change or you suspect docs are outdated, follow this p
 ### Full Audit (periodic)
 1. Fetch https://code.claude.com/docs/llms.txt to get the complete list of official doc pages
 2. Fetch every page listed there (use parallel subagents for speed)
-3. Read all 17 project files
+3. Read all 18 project files
 4. Cross-reference for: factual errors, outdated information, missing features, cross-file inconsistencies
 5. Output a markdown table audit report grouping issues by file
 6. Plan and implement fixes file-by-file in index order
