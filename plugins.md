@@ -6,7 +6,7 @@ Plugins are **installable packages** that bundle skills, hooks, agents, MCP serv
 
 This guide focuses on **using ready-made plugins**, especially the official Anthropic collection. For creating your own plugins, see the [official plugins documentation](https://code.claude.com/docs/en/plugins).
 
-For a quick overview of plugins alongside skills and hooks, see [Extending Claude Code](extending-claude-code.md).
+For a comparison of plugins alongside all other extension mechanisms (skills, hooks, subagents, MCP), see [Extending Claude Code](extending-claude-code.md).
 
 ---
 

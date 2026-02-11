@@ -20,9 +20,9 @@ Start here and work through in order — each file builds on concepts from the p
 | 8   | [Prompt Crafting](prompt-crafting.md)                               | Prompt patterns, scoping techniques, `@` references, letting Claude interview you                 |
 | 9   | [Context Management Strategies](context-management.md)              | Selective reading, subagents, skills for on-demand loading, compaction, checkpointing             |
 | 10  | [Cost Awareness & Model Selection](cost-and-models.md)              | Token costs, Opus vs Sonnet vs Haiku, extended thinking, fast mode, optimization strategies       |
-| 11  | [Subagents Deep Dive](subagents.md)                                 | How the Task tool works — agent types, parallelism, background execution, custom subagents        |
-| 12  | [MCP Server Configuration](mcp-setup.md)                            | Adding MCP servers, tool search, MCP resources, context cost management                           |
-| 13  | [Extending Claude Code](extending-claude-code.md)                   | Skills, hooks, and plugins — on-demand knowledge, guaranteed automation, extension packs          |
+| 11  | [Extending Claude Code](extending-claude-code.md)                   | All 5 extension mechanisms compared — skills, hooks, subagents, MCP, plugins — with decision guide |
+| 12  | [Subagents Deep Dive](subagents.md)                                 | How the Task tool works — agent types, parallelism, background execution, custom subagents        |
+| 13  | [MCP Server Configuration](mcp-setup.md)                            | Adding MCP servers, tool search, MCP resources, context cost management                           |
 | 14  | [Skills Deep Dive](skills.md)                                       | Creating skills, scopes (project/personal/enterprise), arguments, subagent integration, troubleshooting |
 | 15  | [Custom Subagents](custom-agents.md)                                | Create your own subagents in `.claude/agents/` — YAML frontmatter, tools, model overrides        |
 | 16  | [Plugins Deep Dive](plugins.md)                                     | Installing and using plugins — official collection, code intelligence, scopes, managing plugins   |

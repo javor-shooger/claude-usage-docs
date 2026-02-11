@@ -6,7 +6,7 @@ Skills are markdown files that give Claude **domain knowledge** or **reusable wo
 
 Skills follow the [Agent Skills open standard](https://agentskills.io), extended with Claude Code-specific features.
 
-For a quick overview of skills alongside hooks and plugins, see [Extending Claude Code](extending-claude-code.md).
+For a comparison of skills alongside all other extension mechanisms (hooks, subagents, MCP, plugins), see [Extending Claude Code](extending-claude-code.md).
 
 ---
 

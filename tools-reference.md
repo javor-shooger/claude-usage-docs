@@ -163,4 +163,4 @@ For reference, Claude's context window is **200,000 tokens**, so the tool defini
 
 > Built-in tools are always loaded. MCP tools are loaded at session start if the MCP server is configured — not on first invocation.
 
-For details on adding MCP tools, see [MCP Setup](mcp-setup.md). For extending Claude Code with skills, hooks, and plugins, see [Extending Claude Code](extending-claude-code.md).
+For details on adding MCP tools, see [MCP Setup](mcp-setup.md). For all extension mechanisms (skills, hooks, subagents, MCP, plugins), see [Extending Claude Code](extending-claude-code.md).

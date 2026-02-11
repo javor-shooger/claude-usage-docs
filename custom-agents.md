@@ -4,6 +4,8 @@
 
 How to create your own specialized subagents — reusable AI assistants with focused roles, restricted tools, and custom prompts.
 
+For a comparison of subagents alongside all other extension mechanisms (skills, hooks, MCP, plugins), see [Extending Claude Code](extending-claude-code.md).
+
 ---
 
 ## What Are Custom Subagents?

@@ -1,20 +1,24 @@
 # Claude Code: Extending Claude Code
 
-*Last verified against [official docs](https://code.claude.com/docs/en/) on 2026-02-10*
+*Last verified against [official docs](https://code.claude.com/docs/en/) on 2026-02-11*
 
-A beginner-friendly overview of the three main ways to extend Claude Code beyond its built-in capabilities: Skills, Hooks, and Plugins.
+A comparison and decision guide for the five ways to extend Claude Code beyond its built-in capabilities. Each mechanism has a dedicated deep-dive chapter — this page helps you **choose which to use** and understand **how they work together**.
+
+For the official overview, see the [features overview](https://code.claude.com/docs/en/features-overview).
 
 ---
 
-## Why Extend?
+## The Five Extension Mechanisms
 
-Out of the box, Claude Code has powerful built-in tools (Read, Edit, Bash, etc.) and you can add external tools via MCP servers. But there are three more extension layers that let you customize **what Claude knows**, **what it does automatically**, and **how you invoke workflows**:
+| Mechanism            | What It Does                                          | One-Liner                                              | Deep Dive                                                    |
+| -------------------- | ----------------------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------ |
+| **Skills**           | Give Claude reusable knowledge and workflows          | "A prompt template Claude can load on demand"          | [Skills Deep Dive](skills.md)                                |
+| **Hooks**            | Run scripts automatically at specific points          | "If X happens, always do Y — guaranteed"               | [Official hooks docs](https://code.claude.com/docs/en/hooks) |
+| **Custom Subagents** | Delegate tasks to specialized workers                 | "A focused assistant with its own context window"      | [Custom Subagents](custom-agents.md)                         |
+| **MCP Servers**      | Connect Claude to external tools and services         | "An open-protocol bridge to databases, APIs, browsers" | [MCP Setup](mcp-setup.md)                                    |
+| **Plugins**          | Bundle skills + hooks + agents + MCP into one package | "An installable extension pack"                        | [Plugins Deep Dive](plugins.md)                              |
 
-| Extension | What It Does | One-Liner |
-|---|---|---|
-| **Skills** | Give Claude reusable knowledge and workflows | "A prompt template Claude can load on demand" |
-| **Hooks** | Run scripts automatically at specific points | "If X happens, always do Y — guaranteed" |
-| **Plugins** | Bundle skills + hooks + agents into one package | "An installable extension pack" |
+> **Also:** [Agent Teams](https://code.claude.com/docs/en/agent-teams) let you coordinate multiple Claude instances working in parallel. This is an experimental feature (requires `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS`).
 
 ---
 
@@ -22,17 +26,10 @@ Out of the box, Claude Code has powerful built-in tools (Read, Edit, Bash, etc.)
 
 Skills are markdown files that give Claude **domain knowledge** or **reusable workflows**. Unlike CLAUDE.md (which loads every session), skills load **on demand** — only when Claude determines they're relevant or when you invoke them with a slash command.
 
-| Aspect | How it works |
-|---|---|
-| **Where they live** | `.claude/skills/<name>/SKILL.md` (project) or `~/.claude/skills/<name>/SKILL.md` (personal) |
-| **Format** | YAML frontmatter + markdown content. Only `description` is recommended. |
-| **Two types** | *Reference* skills add knowledge (API conventions, style guides). *Task* skills define workflows (`/deploy`, `/fix-issue`). |
-| **Auto vs manual** | By default, Claude loads skills when relevant. Add `disable-model-invocation: true` for manual-only (`/skill-name`). |
-| **Arguments** | Use `$ARGUMENTS` (or `$0`, `$1`) in content. `/fix-issue 1234` passes `1234`. |
-| **Isolation** | Add `context: fork` to run in a subagent with its own context window. |
-| **Context cost** | Descriptions load at startup (small). Full content loads only when invoked. |
+- **Two types:** *Reference* skills add knowledge (API conventions, style guides). *Task* skills define workflows (`/deploy`, `/fix-issue`).
+- **Key property:** Skills are **advisory** — Claude decides when they're relevant. Use `disable-model-invocation: true` for manual-only invocation.
+- **Context cost:** Descriptions load at startup (small). Full content loads only when invoked.
 
-**Quick example — a reference skill:**
 ```markdown
 ---
 description: REST API design conventions for our services
@@ -42,151 +39,175 @@ description: REST API design conventions for our services
 - Always include pagination for list endpoints
 ```
 
-**Quick example — a task skill:**
-```markdown
----
-name: fix-issue
-description: Fix a GitHub issue
-disable-model-invocation: true
----
-Fix GitHub issue $ARGUMENTS. Search the codebase, implement the fix, write tests, commit.
-```
-
-For the full guide — creation walkthrough, all frontmatter fields, arguments, dynamic context injection, subagent integration, permissions, and troubleshooting — see **[Skills Deep Dive](skills.md)**.
-
-For the official specification, see the [official skills documentation](https://code.claude.com/docs/en/skills).
+For the full guide — creation, frontmatter fields, arguments, dynamic context, subagent integration — see **[Skills Deep Dive](skills.md)** and the [official skills documentation](https://code.claude.com/docs/en/skills).
 
 ---
 
 ## Hooks
 
-Hooks are **shell scripts that run automatically** at specific points in Claude's workflow. Unlike CLAUDE.md instructions (which are advisory — Claude can choose to ignore them), hooks are **deterministic and guaranteed**.
+Hooks are **scripts that run automatically** at specific points in Claude's workflow. Unlike CLAUDE.md instructions (which are advisory), hooks are **deterministic and guaranteed**.
 
-### Hook Types
-
-| Type | Description |
-|---|---|
-| **`command`** | Run a shell command (most common) |
-| **`prompt`** | Send a prompt to an LLM for evaluation |
-| **`agent`** | Spawn a subagent with tool access |
-
-### When Hooks Fire
-
-The most commonly used events:
-
-| Hook Event | When It Runs | Example Use |
-|---|---|---|
-| **PreToolUse** | Before Claude uses a tool | Validate a Bash command, block writes to certain files |
-| **PostToolUse** | After a tool succeeds | Run linter after every file edit |
-| **PostToolUseFailure** | After a tool fails | Log failures, retry logic |
-| **Stop** | When Claude finishes a response | Run tests after implementation |
-| **SessionStart** | Session begins or resumes | Load env vars or project context |
-| **SessionEnd** | Session terminates | Cleanup actions |
-| **UserPromptSubmit** | You submit a prompt | Add context to every prompt |
-
-Additional events: **PermissionRequest**, **Notification**, **SubagentStart**, **SubagentStop**, **TeammateIdle**, **TaskCompleted**, **PreCompact** (14 events total).
-
-For the full list, see the [official hooks reference](https://code.claude.com/docs/en/hooks).
-
-### Simple Example
-
-Run ESLint automatically after every file edit. Hooks receive context via **JSON on stdin** — use `jq` to extract fields:
+- **Three types:** `command` (shell script — most common), `prompt` (single LLM call), `agent` (multi-turn subagent with tools).
+- **14 events:** PreToolUse, PostToolUse, Stop, SessionStart, UserPromptSubmit, and [9 more](https://code.claude.com/docs/en/hooks).
+- **Key property:** Hooks **always execute** — Claude cannot skip or ignore them. Exit code `2` blocks the action.
 
 ```json
 {
   "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Edit|Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "jq -r '.tool_input.file_path' | xargs npx eslint --fix"
-          }
-        ]
-      }
-    ]
+    "PostToolUse": [{
+      "matcher": "Edit|Write",
+      "hooks": [{ "type": "command", "command": "jq -r '.tool_input.file_path' | xargs npx eslint --fix" }]
+    }]
   }
 }
 ```
 
-### CLAUDE.md vs Hooks
+For hook events, configuration, and advanced patterns, see the [official hooks documentation](https://code.claude.com/docs/en/hooks).
 
-| | CLAUDE.md Instruction | Hook |
-|---|---|---|
-| "Run lint after edits" | Advisory — Claude *usually* follows it | **Guaranteed** — runs every time, no exceptions |
-| Can Claude skip it? | Yes, if it decides to | No — hooks execute unconditionally |
-| Best for | Guidelines, preferences, conventions | Hard rules that must always happen |
+---
 
-### Key Points
+## Custom Subagents
 
-- Use hooks for things that **must** happen every time with zero exceptions
-- You can ask Claude to write hooks for you: "Write a hook that runs eslint after every file edit"
-- Use `/hooks` for interactive configuration
-- The `matcher` field filters which tools trigger the hook (e.g., only `Bash`, only `Edit|Write`)
-- **Async hooks** (`"async": true`) run in the background without blocking — only available for `command` type hooks
-- **Exit codes matter:** `0` = success, `2` = blocking error (shown to Claude/user), other = non-blocking error
+Custom subagents are **specialized assistants** you define in markdown, each with its own system prompt, restricted tools, and isolated context window.
 
-For the full hook event reference and configuration options, see the [official hooks documentation](https://code.claude.com/docs/en/hooks).
+- **Where they live:** `.claude/agents/<name>.md` (project) or `~/.claude/agents/<name>.md` (personal).
+- **Key property:** Each subagent gets its **own context window** — work doesn't pollute the main conversation. Results are summarized when returned.
+- **Configurable:** Model (Haiku for cheap tasks, Opus for complex), tool restrictions (allowlist or denylist), preloaded skills, and MCP servers.
+
+```markdown
+---
+description: Reviews code for quality issues. Use PROACTIVELY after code changes.
+tools: [Read, Grep, Glob]
+model: haiku
+---
+Review the code for bugs, security issues, and style problems. Be specific and actionable.
+```
+
+For the full guide — creation, frontmatter fields, delegation, background execution — see **[Custom Subagents](custom-agents.md)** and the [official subagents documentation](https://code.claude.com/docs/en/sub-agents).
+
+---
+
+## MCP Servers
+
+MCP servers connect Claude to **external tools and services** via the open [Model Context Protocol](https://code.claude.com/docs/en/mcp). They add tools Claude can invoke — database queries, browser automation, API calls.
+
+- **Where configured:** `~/.claude.json` (personal) or `.mcp.json` (project, team-shared).
+- **Key property:** Open standard — not Claude-specific. Same servers work with any MCP-compatible client.
+- **Context cost:** Tool definitions load at session start (cost varies per server — run `/mcp` to check). Tool Search defers loading when definitions exceed 10% of context.
+
+```json
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": ["@anthropic/mcp-playwright"]
+    }
+  }
+}
+```
+
+For configuration, transports, environment variables, and team sharing — see **[MCP Setup](mcp-setup.md)** and the [official MCP documentation](https://code.claude.com/docs/en/mcp).
 
 ---
 
 ## Plugins
 
-Plugins are **installable packages** that bundle together skills, hooks, subagents, and MCP servers into a single unit. Think of them as extension packs.
+Plugins are **installable packages** that bundle skills, hooks, subagents, MCP servers, and LSP servers into a single unit. One install adds multiple capabilities at once.
 
-### Using Plugins
+- **Install with:** `/plugin` to browse the marketplace, or `claude plugin install <name>`.
+- **Key property:** Code intelligence plugins (LSP) are the most impactful — they give Claude precise "go to definition" and "find references" navigation.
+- **42+ official plugins** covering code intelligence, development workflows, and external integrations (GitHub, Slack, Firebase, etc.).
 
-```
-/plugin                  — browse the marketplace and install plugins
-```
-
-Plugins can come from:
-- **Anthropic's marketplace** — official and community plugins
-- **Your organization** — private plugin marketplaces
-- **Local development** — plugins you create yourself
-
-### What Plugins Can Include
-
-| Component | Example |
-|---|---|
-| Skills | API conventions, deployment checklists |
-| Hooks | Auto-lint, test runners |
-| Subagents | Code reviewer, security scanner |
-| MCP servers | Database tools, monitoring integrations |
-
-### Key Points
-
-- Plugins are the easiest way to add capabilities — one install gets you everything
-- **Code intelligence plugins** are especially useful — they give Claude precise "go to definition" and "find references" navigation for typed languages. See the [plugin marketplace](https://code.claude.com/docs/en/discover-plugins) for available language plugins.
-- You don't need to create plugins to use them — just browse and install
-
-For the full guide — the official plugin collection (42 plugins), code intelligence setup, installation scopes, managing plugins, and marketplace configuration — see **[Plugins Deep Dive](plugins.md)**.
-
-For details on creating your own plugins, see the [official plugins documentation](https://code.claude.com/docs/en/plugins).
+For the full guide — the official collection, code intelligence setup, scopes, marketplaces — see **[Plugins Deep Dive](plugins.md)** and the [official plugins documentation](https://code.claude.com/docs/en/plugins).
 
 ---
 
-## Which Extension Should I Use?
+## Choosing the Right Mechanism
+
+### Decision Table
 
 | I want to... | Use |
 |---|---|
-| Give Claude project knowledge that loads only when relevant | **Skill** — see [Skills Deep Dive](skills.md) |
-| Create a reusable workflow I invoke with `/command` | **Skill** (with `disable-model-invocation: true`) — see [Skills Deep Dive](skills.md) |
-| Guarantee a script runs after every file edit | **Hook** |
+| Give Claude project knowledge that loads when relevant | **Skill** (reference type) — [Skills Deep Dive](skills.md) |
+| Create a reusable workflow invoked with `/command` | **Skill** (with `disable-model-invocation: true`) — [Skills Deep Dive](skills.md) |
+| Guarantee a script runs after every file edit | **Hook** (PostToolUse) |
 | Block Claude from writing to certain files | **Hook** (PreToolUse with exit code 2) |
-| Install a pre-made extension pack | **Plugin** — see [Plugins Deep Dive](plugins.md) |
-| Give Claude "go to definition" navigation | **Plugin** (code intelligence) — see [Plugins Deep Dive](plugins.md) |
-| Add rules that apply every session | **CLAUDE.md** (not an extension — just use your instruction file) |
-| Connect to an external service (Figma, DB, etc.) | **MCP server** (see [MCP Setup](mcp-setup.md)) |
+| Validate or transform commands before execution | **Hook** (PreToolUse) |
+| Run tests automatically when Claude finishes | **Hook** (Stop event) |
+| Delegate a task to a focused worker | **Custom Subagent** — [Custom Subagents](custom-agents.md) |
+| Isolate verbose analysis from the main conversation | **Custom Subagent** (with `context: fork` in skills or Task tool) |
+| Run cheap analysis tasks to save cost | **Custom Subagent** with `model: haiku` |
+| Connect Claude to a database or external API | **MCP Server** — [MCP Setup](mcp-setup.md) |
+| Add browser automation | **MCP Server** (Playwright) — [MCP Setup](mcp-setup.md) |
+| Install a pre-made extension pack | **Plugin** — [Plugins Deep Dive](plugins.md) |
+| Give Claude "go to definition" navigation | **Plugin** (code intelligence / LSP) — [Plugins Deep Dive](plugins.md) |
+| Share tools with my whole team | **Plugin** (`--scope project`) or `.mcp.json` committed to git |
+| Add rules that apply every session | **CLAUDE.md** (not an extension — see [Memory & Instructions](memory-and-instructions.md)) |
+| Coordinate multiple Claude instances in parallel | **Agent Teams** (experimental — [official docs](https://code.claude.com/docs/en/agent-teams)) |
+
+### Comparison Matrix
+
+| Aspect | Skills | Hooks | Custom Subagents | MCP Servers | Plugins |
+|---|---|---|---|---|---|
+| **What it is** | On-demand markdown prompts | Auto-running scripts at lifecycle events | Isolated assistants with custom prompts | External tool connections via open protocol | Bundled extension packs |
+| **Where defined** | `.claude/skills/*/SKILL.md` | Settings JSON or skill/agent frontmatter | `.claude/agents/*.md` | `~/.claude.json` or `.mcp.json` | Installed via `/plugin` |
+| **Loads when** | On demand (relevant or `/invoked`) | Session start → fires at trigger events | On demand (delegated by Claude) | Session start (tools always available) | Session start (components load per type) |
+| **Deterministic?** | No — advisory (Claude decides) | **Yes — guaranteed** every time | No — advisory (Claude delegates) | N/A — tools available on request | Depends on bundled components |
+| **Runs code?** | Yes (`` !`command` `` preprocessing, tool calls) | Yes (shell commands, LLM prompts, subagents) | Yes (tool calls within isolated context) | Yes (external process) | Yes (all bundled components) |
+| **Context cost** | Descriptions at startup; full on invoke | None (runs as subprocess) | Own isolated context window | Tool definitions at startup (varies per server) | Depends on components |
+| **Can be shared?** | Commit `.claude/skills/` to git | Commit settings to git | Commit `.claude/agents/` to git | Commit `.mcp.json` to git | `--scope project` or marketplace |
+| **Created by** | You | You (or ask Claude to write them) | You | External packages / you | Community / Anthropic / you |
+| **Best for** | Knowledge, workflows, conventions | Hard rules, validation, automation | Specialized tasks, cost optimization | External services, APIs, browsers | One-click team setup, code intelligence |
+
+### How They Work Together
+
+These mechanisms are complementary. Real setups often combine several:
+
+**MCP + Skill** — MCP provides the connection, the skill teaches Claude the conventions.
+> Example: MCP server connects to your database. A skill documents your query patterns and schema conventions. As Anthropic puts it: "Use both together: MCP for connectivity, Skills for procedures."
+
+**Skill + Hook** — Hooks can boost skill reliability. Community testing shows skill auto-activation achieves only ~20% activation rate with simple descriptions, but a "forced evaluation" hook that makes Claude explicitly assess each skill raises this to ~84%.
+
+**Subagent + Skill** — Preload skills into a subagent via the `skills:` frontmatter field. The subagent gets focused expertise without loading it into the main conversation.
+
+**Hook + Subagent** — A hook can spawn an `agent`-type handler for multi-turn validation. Example: a Stop hook that runs a code review subagent after every implementation.
+
+**Plugin = Bundle** — A plugin packages any combination of the above for one-click team installation. Start with standalone `.claude/` config, convert to a plugin when ready to share.
+
+### Practical Scenarios
+
+**Setting up a new team project:**
+CLAUDE.md (always-on conventions) + project skills (API patterns, deploy checklist) + hooks (auto-lint after edits, test runner on Stop) + code intelligence plugin (LSP for your language). Each layer serves a different need — CLAUDE.md for basics everyone should follow, skills for on-demand knowledge, hooks for guarantees, plugin for IDE-quality navigation.
+
+**Adding a database integration:**
+MCP server (connection to the database) + skill (query conventions and schema documentation). The MCP server gives Claude the tools to query, the skill teaches Claude *how* to query properly for your project.
+
+**Automating code review:**
+Custom subagent (isolated reviewer with read-only tools: Read, Grep, Glob) + hook (Stop event spawns the review). The subagent isolates the review from main context. The hook guarantees it runs after every implementation — Claude can't skip it.
+
+**Enforcing code standards:**
+Hook, not a skill. Skills are advisory — Claude can choose to ignore them. Hooks execute unconditionally. Community reports document real failures when relying on CLAUDE.md for enforcement: leaked API keys and dangerous commands despite explicit prohibition. Use hooks for anything that *must* happen.
+
+### Common Mistakes
+
+| Don't do this | Do this instead | Why |
+|---|---|---|
+| Use a skill for enforcement | Use a **hook** | Skills are advisory — Claude can skip them. Hooks are guaranteed. |
+| Use MCP to teach conventions | Use a **skill** | MCP connects to data. Skills teach what to do with it. |
+| Write a plugin for one project | Use standalone `.claude/` config | Convert to a plugin only when ready to share. |
+| Give subagents all tools | Apply **least privilege** (allowlist) | Restrict to only the tools the subagent needs. |
+| Enable all MCP servers at once | Select only what you need | Too many servers can shrink your 200K context window to ~70K. |
+| Write 1000-line subagent definitions | Keep concise (~300 lines), extract reusable parts as skills | Community testing shows 54% size reduction *improved* quality scores. |
+| Rely only on CLAUDE.md for safety rules | Add **hooks** as enforcement layer | CLAUDE.md is advisory. Hooks guarantee execution. |
 
 ---
 
 ## Quick Reference
 
-| Extension | Where defined | Loads when | Created by |
-|---|---|---|---|
-| **Skills** | `.claude/skills/*/SKILL.md` or `~/.claude/skills/*/SKILL.md` | On demand (when relevant or invoked) | You |
-| **Hooks** | Settings JSON or managed settings | Automatically at configured trigger points (14 events) | You |
-| **Plugins** | Installed via `/plugin` (see [Plugins Deep Dive](plugins.md)) | At session start | Community / you |
-| **MCP servers** | `~/.claude.json` or `.mcp.json` (`mcpServers` key) | At session start | External packages |
+| Extension | Where defined | Loads when | Created by | Deep Dive |
+|---|---|---|---|---|
+| **Skills** | `.claude/skills/*/SKILL.md` | On demand (relevant or invoked) | You | [Skills Deep Dive](skills.md) |
+| **Hooks** | Settings JSON or skill/agent frontmatter | At trigger events (14 events) | You | [Official docs](https://code.claude.com/docs/en/hooks) |
+| **Custom Subagents** | `.claude/agents/*.md` | On demand (delegated) | You | [Custom Subagents](custom-agents.md) |
+| **MCP Servers** | `~/.claude.json` or `.mcp.json` | At session start | External packages / you | [MCP Setup](mcp-setup.md) |
+| **Plugins** | Installed via `/plugin` | At session start | Community / Anthropic / you | [Plugins Deep Dive](plugins.md) |

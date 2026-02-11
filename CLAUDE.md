@@ -24,7 +24,7 @@ See `index.md` for the full list in recommended reading order. Key files:
 - `cost-and-models.md` — Token costs, model selection, extended thinking, fast mode
 - `subagents.md` — Task tool deep dive, agent types, custom subagents
 - `mcp-setup.md` — MCP server configuration, tool search, resources
-- `extending-claude-code.md` — Skills, hooks, and plugins overview
+- `extending-claude-code.md` — Extension mechanisms compared — skills, hooks, subagents, MCP, plugins — decision guide
 - `skills.md` — Skills deep dive: creation, scopes, arguments, subagent integration
 - `custom-agents.md` — Custom subagents in `.claude/agents/`
 - `plugins.md` — Plugins deep dive: official collection, code intelligence, installation, management
@@ -42,6 +42,13 @@ Each doc file has a "Last verified against official docs on YYYY-MM-DD" line aft
 - Verify the file's content against the official docs (even if no changes were needed)
 - Make substantive edits based on official doc changes
 Do NOT update the date for minor formatting fixes or typo corrections that don't involve checking official docs.
+
+## Extending Claude Code Maintenance Rule
+`extending-claude-code.md` is a **comparison and decision guide** — not a deep dive. It synthesizes information from 5 deep-dive files (skills.md, custom-agents.md, mcp-setup.md, plugins.md, and the official hooks docs) plus community sources. Maintain it differently:
+- **When updating any deep-dive file**, check if the comparison matrix, decision table, or brief summaries in `extending-claude-code.md` need to match. The facts must stay consistent.
+- **When a new extension mechanism is added** (or an existing one changes significantly), update all three sections: the brief summary, the comparison matrix row, and the decision table rows.
+- **Community-sourced claims** (activation rates, context window shrinkage, subagent size recommendations) are marked implicitly by phrases like "community testing shows." These may become outdated — re-verify against current sources during audits.
+- **The comparison matrix must cover all mechanisms equally.** If you add a column or row, fill in every cell — no blanks.
 
 ## Workflows Maintenance Rule
 When adding or updating a topic doc, check if `workflows-and-patterns.md` should be updated too:

@@ -4,6 +4,8 @@
 
 How to add, configure, and manage MCP (Model Context Protocol) servers to extend Claude Code with additional tools.
 
+For a comparison of MCP alongside all other extension mechanisms (skills, hooks, subagents, plugins), see [Extending Claude Code](extending-claude-code.md).
+
 ---
 
 ## What Is MCP?
